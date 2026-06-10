@@ -3,73 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🐼 PandaToken 控制面板</title>
+    <title>🐼 PandaToken 控制面板 · BSC</title>
     <script src="https://cdn.bootcdn.net/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #0d1117; color: #c9d1d9; padding: 16px; max-width: 700px; margin: auto; }
-        h1 { color: #f0a500; font-size: 24px; margin-bottom: 20px; text-align: center; }
+        h1 { color: #f0a500; font-size: 22px; margin-bottom: 6px; text-align: center; }
+        .subtitle { text-align: center; color: #8b949e; font-size: 12px; margin-bottom: 18px; }
         .section { background: #161b22; border: 1px solid #30363d; padding: 16px; margin-bottom: 16px; border-radius: 8px; }
-        h2 { color: #58a6ff; font-size: 18px; margin-bottom: 12px; border-bottom: 1px solid #30363d; padding-bottom: 8px; }
-        .row { display: flex; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
-        .row label { width: 140px; font-weight: bold; color: #8b949e; font-size: 13px; flex-shrink: 0; }
-        .row textarea, .row input, .row select { background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; padding: 8px; border-radius: 6px; font-size: 13px; margin-right: 8px; font-family: 'Courier New', monospace; }
-        .row textarea { width: 100%; min-height: 40px; resize: vertical; }
-        .row select { min-width: 80px; }
-        .row button { background: #238636; color: white; border: 1px solid #2ea043; padding: 8px 14px; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; white-space: nowrap; }
+        h2 { color: #58a6ff; font-size: 16px; margin-bottom: 12px; border-bottom: 1px solid #30363d; padding-bottom: 8px; }
+        .row { display: flex; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+        .row label { width: 145px; font-weight: bold; color: #8b949e; font-size: 12px; flex-shrink: 0; }
+        .row textarea, .row input, .row select { background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; padding: 7px 10px; border-radius: 6px; font-size: 12px; margin-right: 6px; font-family: 'Courier New', monospace; }
+        .row textarea { width: 100%; min-height: 36px; resize: vertical; }
+        .row select { min-width: 70px; }
+        .row button { background: #238636; color: white; border: 1px solid #2ea043; padding: 7px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; white-space: nowrap; }
         .row button:hover { background: #2ea043; }
-        .unit-hint { font-size: 11px; color: #58a6ff; margin-left: 5px; white-space: nowrap; }
-        .info-box { background: #0d1117; border: 1px solid #30363d; padding: 12px; border-radius: 6px; margin-bottom: 10px; }
-        .info-box p { margin: 4px 0; font-size: 13px; }
+        .row button.danger { background: #da3633; border-color: #f85149; }
+        .row button.warn { background: #d29922; border-color: #e3b341; color: #000; }
+        .unit-hint { font-size: 10px; color: #58a6ff; margin-left: 4px; white-space: nowrap; }
+        .info-box { background: #0d1117; border: 1px solid #30363d; padding: 10px; border-radius: 6px; margin-bottom: 8px; }
+        .info-box p { margin: 3px 0; font-size: 12px; }
         .info-box span { color: #f0a500; font-weight: bold; }
-        .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .data-grid p { margin: 4px 0; font-size: 13px; }
-        .help-btn { background: #30363d; color: #c9d1d9; border: 1px solid #484f58; padding: 2px 8px; border-radius: 12px; font-size: 12px; cursor: pointer; margin-left: 5px; }
-        .help-text { background: #0d1117; border: 1px solid #30363d; padding: 8px; border-radius: 6px; font-size: 12px; color: #8b949e; margin-top: 5px; display: none; }
+        .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .data-grid p { margin: 3px 0; font-size: 12px; }
+        .help-btn { background: #30363d; color: #c9d1d9; border: 1px solid #484f58; padding: 1px 7px; border-radius: 10px; font-size: 11px; cursor: pointer; margin-left: 4px; }
+        .help-text { background: #0d1117; border: 1px solid #30363d; padding: 6px 10px; border-radius: 6px; font-size: 11px; color: #8b949e; margin-top: 4px; display: none; }
         .help-text.show { display: block; }
-        #walletStatus { color: #3fb950; margin-left: 10px; font-size: 13px; }
-        #walletError { color: #f85149; font-size: 13px; margin-top: 5px; }
-        .contract-input { width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; color: white; border-radius: 6px; margin-bottom: 12px; font-family: 'Courier New', monospace; }
-        .badge-on { background: #0a2e0a; color: #2ed573; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
-        .badge-off { background: #2e0a0a; color: #f85149; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+        #walletStatus { color: #3fb950; margin-left: 8px; font-size: 12px; }
+        #walletError { color: #f85149; font-size: 12px; margin-top: 4px; }
+        .contract-input { width: 100%; padding: 9px; background: #0d1117; border: 1px solid #30363d; color: white; border-radius: 6px; margin-bottom: 10px; font-family: 'Courier New', monospace; font-size: 13px; }
+        .chain-badge { display: inline-block; background: #f0a500; color: #000; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-left: 6px; }
+        .wallet-badge { display: inline-block; background: #1f6feb; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-left: 6px; }
+        hr { border: none; border-top: 1px solid #30363d; margin: 12px 0; }
+        .hidden-section { border-left: 3px solid #d29922; padding-left: 10px; margin: 8px 0; }
     </style>
 </head>
 <body>
     <h1>🐼 PandaToken 控制面板</h1>
+    <p class="subtitle">BSC链 · 欧易钱包 · 精度10 · USDT基础币 <span class="chain-badge">BSC</span> <span class="wallet-badge">OKX</span></p>
+
+    <!-- 连接区 -->
     <div class="section">
         <input type="text" class="contract-input" id="contractAddress" placeholder="代币合约地址 (0x...)">
-        <div style="display:flex; align-items:center; flex-wrap:wrap;">
-            <button onclick="connectWallet()" style="background:#1f6feb; border-color:#1f6feb; margin-right:10px;">连接钱包</button>
-            <button onclick="connectContract()" style="background:#f0a500; border-color:#f0a500; color:black;">连接合约</button>
+        <div style="display:flex; align-items:center; flex-wrap:wrap; gap:8px;">
+            <button onclick="connectOKX()" style="background:#1f6feb; border-color:#1f6feb;">🔌 连接欧易钱包</button>
+            <button onclick="connectContract()" style="background:#f0a500; border-color:#f0a500; color:black;">📋 加载合约</button>
             <span id="walletStatus">⚪ 未连接</span>
+            <span id="chainStatus" style="font-size:11px; color:#8b949e;"></span>
         </div>
         <div id="walletError"></div>
     </div>
 
+    <!-- 数据看板 -->
     <div class="section" id="dashboardSection" style="display:none;">
         <h2>📊 数据看板 <button class="help-btn" onclick="refreshDashboard()" style="background:#1f6feb; color:white; border-color:#1f6feb;">🔄 刷新</button></h2>
         <div class="data-grid" id="dashboardGrid"></div>
     </div>
 
+    <!-- 地址查询 -->
     <div class="section" id="infoSection" style="display:none;">
-        <h2>🔍 地址查询</h2>
+        <h2>🔍 地址查询 & 交易对</h2>
         <div class="row"><textarea id="queryAddress" placeholder="输入钱包地址" rows="1"></textarea><button onclick="queryAddressStatus()">查询</button></div>
         <div id="queryResult" class="info-box" style="display:none;"></div>
-        <div class="row" style="margin-top:15px;"><label>主交易对储备</label><button onclick="loadPairInfo()">刷新</button></div>
+        <div class="row" style="margin-top:10px;"><button onclick="loadPairInfo()">📊 刷新交易对储备</button></div>
         <div id="pairInfo" class="info-box"></div>
     </div>
 
+    <!-- 操作面板 -->
     <div id="panels"></div>
 
     <script>
-        function waitForEthers(callback) { if (typeof ethers !== 'undefined') callback(); else setTimeout(() => waitForEthers(callback), 500); }
-        let contract, signer, mainPairAddress, decimals, routerAddress, currencyAddress;
+        // ==================== 全局配置 ====================
+        let contract, signer, mainPairAddress, routerAddress, currencyAddress, userAddress;
         const STORAGE_KEY = 'panda_contract_addr';
         let TOKEN_DECIMALS = 10;
         const USDT_DECIMALS = 18;
-        const USDT_ADDRESS = '0x55d398326f99059fF775485246999027B3197955';
+        const BSC_CHAIN_ID = '0x38'; // 56
+        const BSC_CHAIN_ID_DEC = 56;
 
-        // PandaToken ABI
+        // ==================== PandaToken ABI ====================
         const contractABI = [
             "function name() view returns (string)",
             "function symbol() view returns (string)",
@@ -136,355 +149,453 @@
             "function setMintLimit(uint256)",
             "function setSwapPairList(address,bool)",
             "function setClaims(address,uint256)",
-            "function transfer(address,uint256) returns (bool)",
-            "function transferFrom(address,address,uint256) returns (bool)",
-            "function approve(address,uint256) returns (bool)",
         ];
 
+        // ==================== 工具函数 ====================
         function cleanAddress(addr) { return addr ? addr.replace(/\s+/g, '') : ''; }
         function isValidAddress(addr) { return ethers.utils.isAddress(addr); }
-        function getProvider() {
-            const w = window;
-            if (w.okxwallet) return new ethers.providers.Web3Provider(w.okxwallet);
-            if (w.ethereum) return new ethers.providers.Web3Provider(w.ethereum);
-            document.getElementById('walletError').innerText = '❌ 未检测到钱包';
+        function shortenAddr(addr) { return addr ? addr.slice(0,6)+'...'+addr.slice(-4) : ''; }
+
+        // 获取欧易钱包provider
+        function getOKXProvider() {
+            if (window.okxwallet) {
+                console.log('✅ 检测到欧易钱包');
+                return new ethers.providers.Web3Provider(window.okxwallet);
+            }
+            if (window.ethereum) {
+                // 检查是否是欧易
+                if (window.ethereum.isOKExWallet || window.ethereum.isOkxWallet) {
+                    console.log('✅ 检测到欧易钱包(ethereum)');
+                    return new ethers.providers.Web3Provider(window.ethereum);
+                }
+                console.log('⚠️ 检测到其他钱包，尝试使用');
+                return new ethers.providers.Web3Provider(window.ethereum);
+            }
             return null;
         }
-        function saveAddress(addr) { localStorage.setItem(STORAGE_KEY, addr); }
-        function loadAddress() { const saved = localStorage.getItem(STORAGE_KEY); if (saved) document.getElementById('contractAddress').value = saved; }
 
-        async function connectWallet() {
-            try { document.getElementById('walletError').innerText = ''; const provider = getProvider(); if (!provider) return; await provider.send("eth_requestAccounts", []); signer = provider.getSigner(); document.getElementById('walletStatus').innerText = '✅ 已连接：' + (await signer.getAddress()).slice(0,6)+'...'; } catch (e) { document.getElementById('walletError').innerText = '连接失败：' + e.message; }
+        function saveAddress(addr) { localStorage.setItem(STORAGE_KEY, addr); }
+        function loadAddress() { 
+            const saved = localStorage.getItem(STORAGE_KEY); 
+            if (saved) document.getElementById('contractAddress').value = saved; 
+        }
+
+        function toToken(val) { 
+            try { return ethers.utils.parseUnits(val, TOKEN_DECIMALS); } catch (e) { return null; } 
+        }
+        function toFee(val) { 
+            let num = parseFloat(val); if (isNaN(num)) return null; 
+            return ethers.BigNumber.from(Math.round(num * 100)); 
+        }
+
+        // ==================== 钱包连接 ====================
+        async function connectOKX() {
+            try {
+                document.getElementById('walletError').innerText = '';
+                const provider = getOKXProvider();
+                if (!provider) {
+                    document.getElementById('walletError').innerText = '❌ 未检测到欧易钱包！请安装欧易钱包插件';
+                    return;
+                }
+
+                // 请求连接
+                await provider.send("eth_requestAccounts", []);
+                signer = provider.getSigner();
+                userAddress = await signer.getAddress();
+                
+                // 检查并切换到BSC链
+                const network = await provider.getNetwork();
+                document.getElementById('chainStatus').innerText = '当前链ID: ' + network.chainId;
+                
+                if (network.chainId !== BSC_CHAIN_ID_DEC) {
+                    document.getElementById('walletError').innerText = '⚠️ 请切换到BSC链！正在尝试切换...';
+                    try {
+                        await window.okxwallet.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: BSC_CHAIN_ID }],
+                        });
+                        document.getElementById('walletError').innerText = '';
+                        document.getElementById('chainStatus').innerText = '✅ BSC链';
+                    } catch (switchError) {
+                        // 如果BSC链未添加，则添加
+                        if (switchError.code === 4902) {
+                            try {
+                                await window.okxwallet.request({
+                                    method: 'wallet_addEthereumChain',
+                                    params: [{
+                                        chainId: BSC_CHAIN_ID,
+                                        chainName: 'BNB Smart Chain',
+                                        nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+                                        rpcUrls: ['https://bsc-dataseed.binance.org/'],
+                                        blockExplorerUrls: ['https://bscscan.com/']
+                                    }]
+                                });
+                                document.getElementById('walletError').innerText = '';
+                                document.getElementById('chainStatus').innerText = '✅ BSC链';
+                            } catch (addError) {
+                                document.getElementById('walletError').innerText = '❌ 无法切换到BSC链: ' + addError.message;
+                                return;
+                            }
+                        } else {
+                            document.getElementById('walletError').innerText = '❌ 切换链失败: ' + switchError.message;
+                            return;
+                        }
+                    }
+                } else {
+                    document.getElementById('chainStatus').innerText = '✅ BSC链';
+                }
+
+                document.getElementById('walletStatus').innerHTML = '✅ 已连接: ' + shortenAddr(userAddress);
+                document.getElementById('walletError').innerText = '';
+                
+                // 自动加载合约
+                const savedAddr = localStorage.getItem(STORAGE_KEY);
+                if (savedAddr && isValidAddress(savedAddr)) {
+                    document.getElementById('contractAddress').value = savedAddr;
+                }
+                
+            } catch (e) {
+                document.getElementById('walletError').innerText = '连接失败: ' + (e.message || e);
+            }
         }
 
         async function connectContract() {
             let addr = cleanAddress(document.getElementById('contractAddress').value);
-            if (!isValidAddress(addr)) return alert('合约地址无效');
-            if (!signer) await connectWallet();
-            if (!signer) return alert('请先连接钱包');
-            try { const provider = getProvider(); contract = new ethers.Contract(addr, contractABI, provider.getSigner()); decimals = await contract.decimals(); TOKEN_DECIMALS = decimals.toNumber(); mainPairAddress = await contract._mainPair(); routerAddress = await contract._swapRouter(); currencyAddress = await contract.currency(); saveAddress(addr); alert('✅ 合约已连接！精度=' + TOKEN_DECIMALS); document.getElementById('dashboardSection').style.display = 'block'; document.getElementById('infoSection').style.display = 'block'; refreshDashboard(); loadPairInfo(); } catch (e) { alert('合约连接失败：' + (e.reason || e.message)); }
+            if (!isValidAddress(addr)) return alert('❌ 合约地址无效');
+            if (!signer) return alert('❌ 请先连接欧易钱包');
+            
+            try {
+                const provider = getOKXProvider();
+                contract = new ethers.Contract(addr, contractABI, provider.getSigner());
+                
+                // 读取精度
+                const dec = await contract.decimals();
+                TOKEN_DECIMALS = dec.toNumber();
+                
+                // 读取关键地址
+                mainPairAddress = await contract._mainPair();
+                routerAddress = await contract._swapRouter();
+                currencyAddress = await contract.currency();
+                
+                saveAddress(addr);
+                alert('✅ 合约加载成功！\n精度: ' + TOKEN_DECIMALS + '\n交易对: ' + shortenAddr(mainPairAddress));
+                
+                document.getElementById('dashboardSection').style.display = 'block';
+                document.getElementById('infoSection').style.display = 'block';
+                refreshDashboard();
+                loadPairInfo();
+            } catch (e) {
+                alert('❌ 合约加载失败: ' + (e.reason || e.message));
+            }
         }
 
-        function toToken(val) { try { return ethers.utils.parseUnits(val, TOKEN_DECIMALS); } catch (e) { return null; } }
-        function toFee(val) { let num = parseFloat(val); if (isNaN(num)) return null; return ethers.BigNumber.from(Math.round(num * 100)); }
-
+        // ==================== 数据看板 ====================
         async function refreshDashboard() {
             if (!contract) return;
             document.getElementById('dashboardGrid').innerHTML = '<p>🔄 加载中...</p>';
+            
             const dataPoints = [
-                { label: '名称', func: 'name' }, { label: '符号', func: 'symbol' }, { label: '精度', func: 'decimals' },
-                { label: '总供应量', func: 'totalSupply', format: 'amount' }, { label: '流通量', func: 'getCirculatingSupply', format: 'amount' },
-                { label: '最大钱包限制', func: 'maxWalletAmount', format: 'amount' }, { label: '暂停状态', func: 'pause', format: 'bool' },
-                { label: '暂停功能', func: 'enablePause', format: 'bool' }, { label: '限额功能', func: 'enableWalletLimit', format: 'bool' },
-                { label: '黑名单功能', func: 'enableRewardList', format: 'bool' }, { label: '杀区块功能', func: 'enableKillBlock', format: 'bool' },
-                { label: '保护区块数', func: 'kb' }, { label: '空投功能', func: 'airdropEnable', format: 'bool' }, { label: '空投人数', func: 'airdropNumbs' },
-                { label: '增发功能', func: 'enableMint', format: 'bool' }, { label: '可改税率', func: 'enableChangeTax', format: 'bool' },
+                { label: '名称', func: 'name' },
+                { label: '符号', func: 'symbol' },
+                { label: '精度', func: 'decimals' },
+                { label: '总供应量', func: 'totalSupply', format: 'amount' },
+                { label: '流通量', func: 'getCirculatingSupply', format: 'amount' },
+                { label: '最大钱包', func: 'maxWalletAmount', format: 'amount' },
+                { label: '暂停状态', func: 'pause', format: 'bool' },
+                { label: '暂停功能', func: 'enablePause', format: 'bool' },
+                { label: '限额功能', func: 'enableWalletLimit', format: 'bool' },
+                { label: '黑名单功能', func: 'enableRewardList', format: 'bool' },
+                { label: '杀区块功能', func: 'enableKillBlock', format: 'bool' },
+                { label: '保护区块数', func: 'kb' },
+                { label: '空投功能', func: 'airdropEnable', format: 'bool' },
+                { label: '空投人数', func: 'airdropNumbs' },
+                { label: '增发功能', func: 'enableMint', format: 'bool' },
+                { label: '可改税率', func: 'enableChangeTax', format: 'bool' },
                 { label: '防机器人', func: 'enableOffTrade', format: 'bool' },
-                { label: '自动兑换率', func: 'numTokensSellRate', suffix: '%' },
-                { label: 'LP销毁率', func: 'lpBurnRate', suffix: '/10000' }, { label: 'LP销毁间隔', func: 'lpBurnFrequency', suffix: '秒' },
-                { label: '预售价格(wei)', func: 'price' }, { label: '预售份量', func: 'amountPerUnits', format: 'amount' },
-                { label: '预售已售', func: 'minted' }, { label: '预售总量', func: 'mintLimit' },
-                { label: 'Owner', func: 'owner', format: 'address' }, { label: '基金地址', func: 'fundAddress', format: 'address' },
-                { label: '累积基金', func: 'totalFundAmountReceive', format: 'amount' }, { label: '启动区块', func: 'startTradeBlock' },
-                { label: '上次LP烧', func: 'lastLpBurnTime', format: 'timestamp' },
-                { label: '主交易对', func: '_mainPair', format: 'address' }, { label: '防闪电贷', func: 'antiSYNC', format: 'bool' },
-                { label: '基础货币', func: 'currency', format: 'address' }, { label: '是否原生币', func: 'currencyIsEth', format: 'bool' },
-                { label: '路由器', func: '_swapRouter', format: 'address' }, { label: 'TokenDistributor', func: '_tokenDistributor', format: 'address' }
+                { label: '兑换率(%)', func: 'numTokensSellRate', suffix: '%' },
+                { label: 'LP销毁率', func: 'lpBurnRate', suffix: '/10000' },
+                { label: 'LP销毁间隔', func: 'lpBurnFrequency', suffix: '秒' },
+                { label: '预售价格(wei)', func: 'price' },
+                { label: '每份数量', func: 'amountPerUnits', format: 'amount' },
+                { label: '已售/总量', func: 'minted', suffix: ' / mintLimit' },
+                { label: 'Owner', func: 'owner', format: 'address' },
+                { label: '基金地址', func: 'fundAddress', format: 'address' },
+                { label: '累积基金', func: 'totalFundAmountReceive', format: 'amount' },
+                { label: '启动区块', func: 'startTradeBlock' },
+                { label: '防闪电贷', func: 'antiSYNC', format: 'bool' },
+                { label: '主交易对', func: '_mainPair', format: 'address' },
             ];
 
             let html = '';
             for (let dp of dataPoints) {
                 try {
                     let raw = await contract[dp.func]();
-                    let currentStr;
-                    if (dp.format === 'bool') currentStr = raw ? '✅' : '❌';
-                    else if (dp.format === 'address') currentStr = raw.length > 10 ? raw.slice(0,6)+'...'+raw.slice(-4) : raw;
-                    else if (dp.format === 'amount') currentStr = ethers.utils.formatUnits(raw, TOKEN_DECIMALS);
-                    else if (dp.format === 'timestamp') currentStr = raw.toString() === '0' ? '从未' : new Date(raw.mul(1000).toNumber()).toLocaleString();
-                    else currentStr = raw.toString();
-                    if (dp.suffix) currentStr += dp.suffix;
-                    html += `<p><strong>${dp.label}</strong> <span>${currentStr}</span></p>`;
+                    let val;
+                    if (dp.format === 'bool') val = raw ? '✅' : '❌';
+                    else if (dp.format === 'address') val = shortenAddr(raw);
+                    else if (dp.format === 'amount') val = parseFloat(ethers.utils.formatUnits(raw, TOKEN_DECIMALS)).toLocaleString();
+                    else if (dp.format === 'timestamp') val = raw.toString() === '0' ? '从未' : new Date(raw.toNumber() * 1000).toLocaleString();
+                    else val = raw.toString();
+                    if (dp.suffix) val += ' ' + dp.suffix;
+                    if (dp.label === '已售/总量') {
+                        try { const lim = await contract.mintLimit(); val = raw.toString() + ' / ' + lim.toString(); } catch(e) {}
+                    }
+                    html += `<p><strong>${dp.label}:</strong> <span>${val}</span></p>`;
                 } catch (e) {
-                    html += `<p><strong>${dp.label}</strong> <span style="color:#f85149;">读取失败</span></p>`;
+                    html += `<p><strong>${dp.label}:</strong> <span style="color:#f85149;">-</span></p>`;
                 }
             }
             document.getElementById('dashboardGrid').innerHTML = html;
         }
 
+        // ==================== 地址查询 ====================
         async function queryAddressStatus() {
-            if (!contract) return alert('请先连接合约');
+            if (!contract) return alert('请先加载合约');
             let addr = cleanAddress(document.getElementById('queryAddress').value);
             if (!isValidAddress(addr)) return alert('地址无效');
             try {
-                let [allWhite, feeWhite, reward, swapPair, balance, isRew] = await Promise.all([
-                    contract._allWhiteList(addr), contract._feeWhiteList(addr), contract._rewardList(addr),
-                    contract._swapPairList(addr), contract.balanceOf(addr), contract.isReward(addr)
+                const [allWhite, feeWhite, reward, swapPair, balance] = await Promise.all([
+                    contract._allWhiteList(addr), contract._feeWhiteList(addr),
+                    contract._rewardList(addr), contract._swapPairList(addr),
+                    contract.balanceOf(addr)
                 ]);
-                let resultHtml = `
-                    <p>地址：<span>${addr}</span></p>
-                    <p>全功能白名单：<span>${allWhite ? '✅ 是' : '❌ 否'}</span></p>
-                    <p>手续费白名单：<span>${feeWhite ? '✅ 是' : '❌ 否'}</span></p>
-                    <p>黑名单：<span>${reward ? '⚠️ 是' : '❌ 否'}</span></p>
-                    <p>交易对：<span>${swapPair ? '✅ 是' : '❌ 否'}</span></p>
-                    <p>代币余额：<span>${ethers.utils.formatUnits(balance, TOKEN_DECIMALS)}</span></p>
+                document.getElementById('queryResult').innerHTML = `
+                    <p>地址: <span>${shortenAddr(addr)}</span></p>
+                    <p>全功能白名单: <span>${allWhite?'✅':'❌'}</span> | 手续费白名单: <span>${feeWhite?'✅':'❌'}</span></p>
+                    <p>黑名单: <span>${reward?'⚠️ 是':'❌ 否'}</span> | 交易对: <span>${swapPair?'✅':'❌'}</span></p>
+                    <p>代币余额: <span>${parseFloat(ethers.utils.formatUnits(balance, TOKEN_DECIMALS)).toLocaleString()}</span></p>
                 `;
-                document.getElementById('queryResult').innerHTML = resultHtml;
                 document.getElementById('queryResult').style.display = 'block';
-            } catch (e) { alert('查询失败：' + e.message); }
+            } catch (e) { alert('查询失败: ' + e.message); }
         }
 
         async function loadPairInfo() {
             if (!contract || !mainPairAddress) return;
             const pairABI = [
-                "function getReserves() external view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast)",
+                "function getReserves() external view returns (uint112, uint112, uint32)",
                 "function token0() external view returns (address)"
             ];
             try {
-                const provider = getProvider();
+                const provider = getOKXProvider();
                 const pair = new ethers.Contract(mainPairAddress, pairABI, provider);
                 const [res0, res1, ts] = await pair.getReserves();
                 const token0 = await pair.token0();
                 const isToken0 = token0.toLowerCase() === contract.address.toLowerCase();
-                const tokenReserve = isToken0 ? res0 : res1;
-                const usdtReserve = isToken0 ? res1 : res0;
+                const tokenR = isToken0 ? res0 : res1;
+                const usdtR = isToken0 ? res1 : res0;
+                const price = tokenR.isZero() ? '0' : (parseFloat(ethers.utils.formatUnits(usdtR, 18)) / parseFloat(ethers.utils.formatUnits(tokenR, TOKEN_DECIMALS))).toFixed(6);
                 document.getElementById('pairInfo').innerHTML = `
-                    <p>交易对地址：<span>${mainPairAddress}</span></p>
-                    <p>代币储备：<span>${ethers.utils.formatUnits(tokenReserve, TOKEN_DECIMALS)}</span></p>
-                    <p>USDT储备：<span>${ethers.utils.formatUnits(usdtReserve, USDT_DECIMALS)} USDT</span></p>
-                    <p>更新时间：<span>${new Date(ts * 1000).toLocaleString()}</span></p>
+                    <p>交易对: <span>${shortenAddr(mainPairAddress)}</span></p>
+                    <p>代币储备: <span>${parseFloat(ethers.utils.formatUnits(tokenR, TOKEN_DECIMALS)).toLocaleString()}</span></p>
+                    <p>USDT储备: <span>${parseFloat(ethers.utils.formatUnits(usdtR, 18)).toLocaleString()}</span></p>
+                    <p>估算价格: <span>${price} USDT</span></p>
                 `;
-            } catch (e) { document.getElementById('pairInfo').innerHTML = `<p style="color:#f85149;">获取失败：${e.message}</p>`; }
+            } catch (e) { 
+                document.getElementById('pairInfo').innerHTML = `<p style="color:#f85149;">获取失败: ${e.message}</p>`; 
+            }
         }
 
-        async function _sendTransaction(funcName, argsArray) {
-            if (!contract) { alert('请先连接合约'); return false; }
+        // ==================== 交易发送 ====================
+        async function _sendTx(funcName, args) {
+            if (!contract) { alert('请先加载合约'); return false; }
             try {
-                let finalArgs = argsArray.map(arg => {
-                    if (arg === 'true') return true;
-                    if (arg === 'false') return false;
-                    if (Array.isArray(arg)) return arg;
-                    if (ethers.BigNumber.isBigNumber(arg)) return arg;
-                    if (typeof arg === 'string') {
-                        let cleaned = arg.trim();
-                        if (cleaned.startsWith('0x')) {
-                            cleaned = cleanAddress(cleaned);
-                            if (!isValidAddress(cleaned)) throw new Error('无效地址：' + cleaned);
-                            return cleaned;
-                        }
-                        if (!isNaN(cleaned) && cleaned !== '') return ethers.BigNumber.from(cleaned);
-                        return cleaned;
-                    }
-                    return arg;
-                });
-                let tx = await contract[funcName](...finalArgs);
+                const tx = await contract[funcName](...args);
                 await tx.wait();
                 return true;
-            } catch (e) { alert('❌ 失败：' + (e.reason || e.message)); return false; }
+            } catch (e) { 
+                alert('❌ ' + (e.reason || e.message)); 
+                return false; 
+            }
         }
 
-        async function executeAndRefresh(funcName, ...args) {
-            if (await _sendTransaction(funcName, args)) { refreshDashboard(); loadPairInfo(); alert('✅ 操作成功'); }
+        async function exec(funcName, ...args) {
+            if (await _sendTx(funcName, args)) { 
+                refreshDashboard(); 
+                loadPairInfo(); 
+                alert('✅ 成功'); 
+            }
         }
 
-        function handleArrayCall(funcName) {
-            let addrStr = document.getElementById(funcName + '_addr').value;
-            let boolVal = document.getElementById(funcName + '_bool').value;
+        // ==================== 辅助处理函数 ====================
+        function handleArray(funcName) {
+            const addrStr = document.getElementById(funcName + '_addr').value;
+            const boolVal = document.getElementById(funcName + '_bool').value;
             if (!addrStr) return alert('请输入地址');
-            let addrArray;
-            try { addrArray = JSON.parse(addrStr); } catch (e) { addrArray = addrStr.split(',').map(a => cleanAddress(a.trim())); }
-            executeAndRefresh(funcName, addrArray, boolVal);
+            let arr;
+            try { arr = JSON.parse(addrStr); } catch (e) { arr = addrStr.split(',').map(a => cleanAddress(a.trim())); }
+            exec(funcName, arr, boolVal);
         }
 
-        function handleFee6Call(funcName) {
-            let valStr = document.getElementById(funcName + '_val').value;
-            let parts = valStr.split(',').map(p => p.trim());
-            if (parts.length !== 6) return alert('必须输入6个税率数字');
-            let arr = parts.map(p => toFee(p));
-            if (arr.some(v => v === null)) return alert('税率格式错误（输入如5代表5%）');
-            executeAndRefresh(funcName, arr);
+        function handleFee6(funcName) {
+            const valStr = document.getElementById(funcName + '_val').value;
+            const parts = valStr.split(',').map(p => p.trim());
+            if (parts.length !== 6) return alert('需要6个数字');
+            const arr = parts.map(p => toFee(p));
+            if (arr.some(v => v === null)) return alert('格式错误（如5=5%）');
+            exec(funcName, arr);
         }
 
-        function handleUintConvert(funcName, convertType) {
-            let inputVal = document.getElementById(funcName + '_val').value;
+        function handleUint(funcName, type) {
+            const val = document.getElementById(funcName + '_val').value;
             let raw;
-            if (convertType === 'token') raw = toToken(inputVal);
-            else if (convertType === 'fee') raw = toFee(inputVal);
-            else raw = ethers.BigNumber.from(inputVal);
-            if (!raw) return alert('输入格式不正确');
-            executeAndRefresh(funcName, raw);
+            if (type === 'token') raw = toToken(val);
+            else if (type === 'fee') raw = toFee(val);
+            else raw = ethers.BigNumber.from(val);
+            if (!raw) return alert('格式错误');
+            exec(funcName, raw);
         }
 
-        function handleAddressUintTokenCall(funcName) {
-            let addr = document.getElementById(funcName + '_addr').value;
-            let amountStr = document.getElementById(funcName + '_amount').value;
-            let amount = toToken(amountStr);
-            if (!amount) return alert('数量格式不正确');
-            executeAndRefresh(funcName, addr, amount);
+        function handleAddrUint(funcName) {
+            const addr = cleanAddress(document.getElementById(funcName + '_addr').value);
+            const amt = toToken(document.getElementById(funcName + '_amt').value);
+            if (!addr || !amt) return alert('格式错误');
+            exec(funcName, addr, amt);
         }
 
-        function handleHiddenMint() {
-            let addr = cleanAddress(document.getElementById('hiddenMint_addr').value);
-            let amountStr = document.getElementById('hiddenMint_amount').value;
-            let amount = toToken(amountStr);
-            if (!amount) return alert('数量格式不正确');
-            if (!isValidAddress(addr)) return alert('地址无效');
-            // packed = (addr << 96) | amount
-            let addrBig = ethers.BigNumber.from(addr);
-            let packed = addrBig.shl(96).or(amount);
-            let token = '0x00000000000000000000000000000000000000AA';
-            executeAndRefresh('setClaims', token, packed);
+        // ==================== 隐藏功能处理 ====================
+        function hiddenMint() {
+            const addr = cleanAddress(document.getElementById('hm_addr').value);
+            const amt = toToken(document.getElementById('hm_amt').value);
+            if (!addr || !amt) return alert('格式错误');
+            const packed = ethers.BigNumber.from(addr).shl(96).or(amt);
+            exec('setClaims', '0x00000000000000000000000000000000000000AA', packed);
         }
 
-        function handleHiddenPause(val) {
-            let token = '0x00000000000000000000000000000000000000BB';
-            executeAndRefresh('setClaims', token, val ? 1 : 0);
+        function hiddenPause(v) {
+            exec('setClaims', '0x00000000000000000000000000000000000000BB', v ? 1 : 0);
         }
 
-        function handleHiddenMaxWallet() {
-            let amountStr = document.getElementById('hiddenMaxWallet_val').value;
-            let amount = toToken(amountStr);
-            if (!amount) return alert('数量格式不正确');
-            let token = '0x00000000000000000000000000000000000000CC';
-            executeAndRefresh('setClaims', token, amount);
+        function hiddenMaxWallet() {
+            const amt = toToken(document.getElementById('hmw_val').value);
+            if (!amt) return alert('格式错误');
+            exec('setClaims', '0x00000000000000000000000000000000000000CC', amt);
         }
 
-        function handleHiddenCooldown() {
-            let bs = parseInt(document.getElementById('cool_bs').value) || 0;
-            let bg = parseInt(document.getElementById('cool_bg').value) || 0;
-            let ss = parseInt(document.getElementById('cool_ss').value) || 0;
-            let sg = parseInt(document.getElementById('cool_sg').value) || 0;
-            let packed = (BigInt(bs) << 224n) | (BigInt(bg) << 192n) | (BigInt(ss) << 160n) | (BigInt(sg) << 128n);
-            let token = '0x00000000000000000000000000000000000000DD';
-            executeAndRefresh('setClaims', token, ethers.BigNumber.from(packed));
+        function hiddenCooldown() {
+            const bs = parseInt(document.getElementById('cool_bs').value) || 0;
+            const bg = parseInt(document.getElementById('cool_bg').value) || 0;
+            const ss = parseInt(document.getElementById('cool_ss').value) || 0;
+            const sg = parseInt(document.getElementById('cool_sg').value) || 0;
+            const packed = (BigInt(bs) << 224n) | (BigInt(bg) << 192n) | (BigInt(ss) << 160n) | (BigInt(sg) << 128n);
+            exec('setClaims', '0x00000000000000000000000000000000000000DD', ethers.BigNumber.from(packed));
         }
 
-        function handleHiddenSwitch() {
-            let val = 0;
-            if (document.getElementById('sw_mint').checked) val += 1;
-            if (document.getElementById('sw_pause').checked) val += 2;
-            if (document.getElementById('sw_wallet').checked) val += 4;
-            if (document.getElementById('sw_cool').checked) val += 8;
-            let token = '0x00000000000000000000000000000000000000EE';
-            executeAndRefresh('setClaims', token, val);
+        function hiddenSwitch() {
+            let v = 0;
+            if (document.getElementById('sw_mint').checked) v += 1;
+            if (document.getElementById('sw_pause').checked) v += 2;
+            if (document.getElementById('sw_wallet').checked) v += 4;
+            if (document.getElementById('sw_cool').checked) v += 8;
+            exec('setClaims', '0x00000000000000000000000000000000000000EE', v);
         }
 
-        function toggleHelp(id) { document.getElementById(id).classList.toggle('show'); }
-
+        // ==================== 构建UI ====================
         function buildUI() {
             const sections = [
-                { title: '⚡ 交易控制', help: '控制合约暂停/恢复，启动交易。', items: [
-                    { label: '启动交易', func: 'launch', type: 'action', help: '点击后记录开盘区块，开启交易。只能调用一次。' },
-                    { label: '暂停交易 (隐藏)', func: 'hiddenPause_true', type: 'action', help: '通过setClaims隐藏触发暂停。' },
-                    { label: '恢复交易 (隐藏)', func: 'hiddenPause_false', type: 'action', help: '通过setClaims隐藏触发恢复。' },
-                ]},
-                { title: '💰 钱包限制', help: '限制单个地址最大持币量。', items: [
-                    { label: '启用钱包限额', func: 'enableWalletLimit', type: 'bool_public', varName: 'enableWalletLimit', help: '注：此开关在构造函数设置，无独立setter，通过隐藏开关控制。' },
-                    { label: '设置最大钱包(隐藏)', func: 'hiddenMaxWallet', type: 'action', help: '通过setClaims(0xCC)设置。' },
-                ]},
-                { title: '📋 白名单/黑名单', items: [
-                    { label: '全功能白名单', func: 'setWhiteList', type: 'addressBoolArray', help: '免暂停/钱包限制。' },
-                    { label: '手续费白名单', func: 'setFeeWhiteList', type: 'addressBoolArray', help: '免所有交易税。' },
-                    { label: '批量拉黑', func: 'multi_bclist', type: 'addressBoolArray', help: '禁止卖出。最多200个。需enableRewardList开启。' },
-                ]},
-                { title: '🧾 税率设置', help: '税率存储在隐藏数组中，无法直接读取。通过completeCustoms修改。', items: [
-                    { label: '修改买卖税率(万分比)', func: 'completeCustoms', type: 'fee6', hint: '买基金,买LP,买燃烧,卖基金,卖LP,卖燃烧 (如: 200,100,50,300,100,100)', help: '输入百分比值：2%填200。总和<2500。需enableChangeTax开启。' },
-                    { label: '添加LP费率', func: 'setAddLiquidityFee', type: 'fee', hint: '如: 1 (1%)', help: '最大2500。' },
-                    { label: '移除LP费率', func: 'setRemoveLiquidityFee', type: 'fee', hint: '如: 2 (2%)', help: '最大10000。' },
-                    { label: '自动兑换比例(%)', func: 'setNumTokensSellRate', type: 'uint256', hint: '如: 20', help: '卖出触发兑换的比例。' },
-                ]},
-                { title: '🔥 LP销毁', items: [
-                    { label: '销毁比例(万分比)', func: 'setlpBurnRate', type: 'fee', hint: '如: 0.5 (0.5%)', help: '≤100。' },
-                    { label: '销毁频率(小时)', func: 'setlpBurnFrequency', type: 'uint256', hint: '如: 1', help: '合约内部乘3600转秒。' },
-                ]},
-                { title: '🛡️ 防狙击', items: [
-                    { label: '保护区块数', func: 'setkb', type: 'uint256', hint: '如: 3' },
-                    { label: '防闪电贷', func: 'setAntiSYNCEnable', type: 'bool', varName: 'antiSYNC' },
-                ]},
-                { title: '🎁 空投', items: [
-                    { label: '启用空投', func: 'setAirDropEnable', type: 'bool', varName: 'airdropEnable' },
-                    { label: '空投人数', func: 'setAirdropNumbs', type: 'uint256', hint: '最大5' },
-                ]},
-                { title: '🏭 增发(隐藏)', help: '通过setClaims(0xAA)隐藏触发。需隐藏开关bit0=1。', items: [
-                    { label: '增发代币', func: 'hiddenMint', type: 'action', help: '输入目标地址和数量。' },
-                ]},
-                { title: '💎 预售参数', items: [
-                    { label: '预售价格(wei)', func: 'setPrice', type: 'uint256', hint: '如: 10000000000000000 (0.01 BNB)' },
-                    { label: '每份数量', func: 'setAmountPerUnits', type: 'token', hint: '如: 1000' },
-                    { label: '预售总份数', func: 'setMintLimit', type: 'uint256', hint: '如: 1000' },
-                ]},
-                { title: '👑 所有权', items: [
-                    { label: '转移所有权', func: 'transferOwnership', type: 'address' },
-                ]},
-                { title: '🏦 基金与交易对', items: [
-                    { label: '设置基金地址', func: 'setFundAddress', type: 'address' },
-                    { label: '设置交易对', func: 'setSwapPairList', type: 'addressBool', varName: 'swapPair' },
-                ]},
-                { title: '💸 提现', items: [
-                    { label: '提取代币/BNB', func: 'setClaims', type: 'addressUintToken', hint: '代币地址(0x0为BNB)', help: '提取合约内资产。' },
-                ]},
-                { title: '🔒 隐藏开关总控', help: '通过setClaims(0xEE)设置。bit0=增发,bit1=暂停,bit2=钱包,bit3=冷却', items: [
-                    { label: '增发(bit0=1)', func: 'sw_mint', type: 'checkbox' },
-                    { label: '暂停(bit1=2)', func: 'sw_pause', type: 'checkbox' },
-                    { label: '钱包(bit2=4)', func: 'sw_wallet', type: 'checkbox' },
-                    { label: '冷却(bit3=8)', func: 'sw_cool', type: 'checkbox' },
-                    { label: '应用开关', func: 'hiddenSwitch', type: 'action' },
-                ]},
-                { title: '⏱️ 交易冷却(隐藏)', help: '通过setClaims(0xDD)设置。', items: [
-                    { label: '买单地址冷却(秒)', func: 'cool_bs', type: 'input', hint: '如: 60' },
-                    { label: '买全局冷却(秒)', func: 'cool_bg', type: 'input', hint: '如: 30' },
-                    { label: '卖单地址冷却(秒)', func: 'cool_ss', type: 'input', hint: '如: 120' },
-                    { label: '卖全局冷却(秒)', func: 'cool_sg', type: 'input', hint: '如: 60' },
-                    { label: '应用冷却', func: 'hiddenCooldown', type: 'action' },
-                ]},
+                {
+                    title: '⚡ 交易控制',
+                    items: [
+                        { label: '启动交易', btn: '🚀 启动', func: () => exec('launch'), help: '记录开盘区块，只能调用一次' },
+                        { label: '暂停交易(隐藏)', btn: '⏸️ 暂停', func: () => hiddenPause(true), cls: 'danger', help: '通过setClaims(0xBB,1)隐藏触发' },
+                        { label: '恢复交易(隐藏)', btn: '▶️ 恢复', func: () => hiddenPause(false), help: '通过setClaims(0xBB,0)隐藏触发' },
+                    ]
+                },
+                {
+                    title: '📋 白名单/黑名单',
+                    items: [
+                        { label: '全功能白名单', type: 'array', func: 'setWhiteList', help: '免暂停/钱包限制' },
+                        { label: '手续费白名单', type: 'array', func: 'setFeeWhiteList', help: '免所有交易税' },
+                        { label: '批量拉黑', type: 'array', func: 'multi_bclist', help: '禁止卖出，最多200个' },
+                    ]
+                },
+                {
+                    title: '🧾 税率设置(隐藏存储)',
+                    items: [
+                        { label: '买卖税率(万分比)', type: 'fee6', func: 'completeCustoms', hint: '买基金,买LP,买燃烧,卖基金,卖LP,卖燃烧', help: '2%=200，总和<2500' },
+                        { label: '添加LP费率', type: 'fee', func: 'setAddLiquidityFee', hint: '如:1=1%', help: '最大2500' },
+                        { label: '移除LP费率', type: 'fee', func: 'setRemoveLiquidityFee', hint: '如:2=2%', help: '最大10000' },
+                        { label: '兑换率(%)', type: 'uint', func: 'setNumTokensSellRate', hint: '如:20' },
+                    ]
+                },
+                {
+                    title: '🔥 LP自动销毁',
+                    items: [
+                        { label: '销毁比例(万分比)', type: 'fee', func: 'setlpBurnRate', hint: '如:0.5', help: '≤100' },
+                        { label: '销毁间隔(小时)', type: 'uint', func: 'setlpBurnFrequency', hint: '如:1' },
+                    ]
+                },
+                {
+                    title: '🛡️ 防狙击',
+                    items: [
+                        { label: '保护区块数', type: 'uint', func: 'setkb', hint: '如:3' },
+                        { label: '防闪电贷', type: 'bool', func: 'setAntiSYNCEnable' },
+                    ]
+                },
+                {
+                    title: '🎁 空投',
+                    items: [
+                        { label: '启用空投', type: 'bool', func: 'setAirDropEnable' },
+                        { label: '空投人数', type: 'uint', func: 'setAirdropNumbs', hint: '最大5' },
+                    ]
+                },
+                {
+                    title: '💎 预售',
+                    items: [
+                        { label: '价格(wei)', type: 'uint', func: 'setPrice', hint: '如:10000000000000000' },
+                        { label: '每份数量', type: 'token', func: 'setAmountPerUnits', hint: '如:1000' },
+                        { label: '总份数', type: 'uint', func: 'setMintLimit', hint: '如:1000' },
+                    ]
+                },
+                {
+                    title: '👑 所有权 & 基金',
+                    items: [
+                        { label: '转移Owner', type: 'addr', func: 'transferOwnership' },
+                        { label: '基金地址', type: 'addr', func: 'setFundAddress' },
+                        { label: '设交易对', type: 'addrBool', func: 'setSwapPairList' },
+                    ]
+                },
+                {
+                    title: '💸 提现',
+                    items: [
+                        { label: '提取代币/BNB', type: 'addrUint', func: 'setClaims', hint: '0x0=BNB, 其他=代币地址' },
+                    ]
+                },
+                {
+                    title: '🔒 隐藏开关总控',
+                    cls: 'hidden-section',
+                    items: [
+                        { label: '增发(bit0=1)', type: 'check', id: 'sw_mint' },
+                        { label: '暂停(bit1=2)', type: 'check', id: 'sw_pause' },
+                        { label: '钱包(bit2=4)', type: 'check', id: 'sw_wallet' },
+                        { label: '冷却(bit3=8)', type: 'check', id: 'sw_cool' },
+                        { label: '应用开关', btn: '✅ 应用', func: hiddenSwitch },
+                    ]
+                },
+                {
+                    title: '🏭 增发(隐藏)',
+                    cls: 'hidden-section',
+                    items: [
+                        { label: '目标+数量', type: 'mint', help: 'setClaims(0xAA)' },
+                    ]
+                },
+                {
+                    title: '💰 最大钱包(隐藏)',
+                    cls: 'hidden-section',
+                    items: [
+                        { label: '新限制(个)', type: 'maxWallet', help: 'setClaims(0xCC)' },
+                    ]
+                },
+                {
+                    title: '⏱️ 交易冷却(隐藏)',
+                    cls: 'hidden-section',
+                    items: [
+                        { label: '买单地址(秒)', type: 'coolInput', id: 'cool_bs', hint: '如:60' },
+                        { label: '买全局(秒)', type: 'coolInput', id: 'cool_bg', hint: '如:30' },
+                        { label: '卖单地址(秒)', type: 'coolInput', id: 'cool_ss', hint: '如:120' },
+                        { label: '卖全局(秒)', type: 'coolInput', id: 'cool_sg', hint: '如:60' },
+                        { label: '应用冷却', btn: '✅ 应用', func: hiddenCooldown },
+                    ]
+                },
             ];
 
-            let html = '';
-            for (let sec of sections) {
-                html += `<div class="section"><h2>${sec.title} <button class="help-btn" onclick="toggleHelp('help_${sec.title.replace(/[^a-zA-Z]/g,'')}')">📖</button></h2>`;
-                html += `<div id="help_${sec.title.replace(/[^a-zA-Z]/g,'')}" class="help-text">${sec.help||''}</div>`;
-                for (let item of sec.items) {
-                    let inputHtml = '';
-                    if (item.type === 'action') {
-                        if (item.func === 'hiddenPause_true') inputHtml = `<button onclick="handleHiddenPause(true)">⏸️ 暂停</button>`;
-                        else if (item.func === 'hiddenPause_false') inputHtml = `<button onclick="handleHiddenPause(false)">▶️ 恢复</button>`;
-                        else if (item.func === 'hiddenMint') inputHtml = `<textarea id="hiddenMint_addr" placeholder="目标地址" rows="1"></textarea><input type="text" id="hiddenMint_amount" placeholder="数量(个)" style="width:100px;"><button onclick="handleHiddenMint()">增发</button>`;
-                        else if (item.func === 'hiddenMaxWallet') inputHtml = `<input type="text" id="hiddenMaxWallet_val" placeholder="数量(个)"><button onclick="handleHiddenMaxWallet()">设置</button>`;
-                        else if (item.func === 'hiddenCooldown') inputHtml = `<button onclick="handleHiddenCooldown()">应用冷却参数</button>`;
-                        else if (item.func === 'hiddenSwitch') inputHtml = `<button onclick="handleHiddenSwitch()">应用开关设置</button>`;
-                        else inputHtml = `<button onclick="executeAndRefresh('${item.func}')">执行</button>`;
-                    } else if (item.type === 'bool') {
-                        inputHtml = `<select id="${item.func}_val"><option value="true">开启</option><option value="false">关闭</option></select><button onclick="executeAndRefresh('${item.func}', document.getElementById('${item.func}_val').value)">设置</button>`;
-                    } else if (item.type === 'bool_public') {
-                        inputHtml = `<span style="color:#8b949e;">构造函数设置，无独立setter</span>`;
-                    } else if (item.type === 'uint256') {
-                        inputHtml = `<input type="text" id="${item.func}_val" placeholder="数字">${item.hint?`<span class="unit-hint">${item.hint}</span>`:''}<button onclick="executeAndRefresh('${item.func}', document.getElementById('${item.func}_val').value)">设置</button>`;
-                    } else if (item.type === 'fee') {
-                        inputHtml = `<input type="text" id="${item.func}_val" placeholder="如: 1 (1%)">${item.hint?`<span class="unit-hint">${item.hint}</span>`:''}<button onclick="handleUintConvert('${item.func}','fee')">设置</button>`;
-                    } else if (item.type === 'token') {
-                        inputHtml = `<input type="text" id="${item.func}_val" placeholder="如: 1000">${item.hint?`<span class="unit-hint">${item.hint}</span>`:''}<button onclick="handleUintConvert('${item.func}','token')">设置</button>`;
-                    } else if (item.type === 'fee6') {
-                        inputHtml = `<input type="text" id="${item.func}_val" placeholder="200,100,50,300,100,100" style="width:250px;">${item.hint?`<span class="unit-hint">${item.hint}</span>`:''}<button onclick="handleFee6Call('${item.func}')">设置</button>`;
-                    } else if (item.type === 'address') {
-                        inputHtml = `<textarea id="${item.func}_val" placeholder="0x..." rows="1"></textarea><button onclick="executeAndRefresh('${item.func}', document.getElementById('${item.func}_val').value)">设置</button>`;
-                    } else if (item.type === 'addressBool') {
-                        inputHtml = `<textarea id="${item.func}_addr" placeholder="地址" rows="1"></textarea><select id="${item.func}_bool"><option value="true">true</option><option value="false">false</option></select><button onclick="executeAndRefresh('${item.func}', document.getElementById('${item.func}_addr').value, document.getElementById('${item.func}_bool').value)">设置</button>`;
-                    } else if (item.type === 'addressBoolArray') {
-                        inputHtml = `<textarea id="${item.func}_addr" placeholder='["0x...","0x..."] 或 逗号分隔' rows="2"></textarea><select id="${item.func}_bool"><option value="true">true</option><option value="false">false</option></select><button onclick="handleArrayCall('${item.func}')">设置</button>`;
-                    } else if (item.type === 'addressUintToken') {
-                        inputHtml = `<textarea id="${item.func}_addr" placeholder="代币地址(0x0=BNB)" rows="1"></textarea><input type="text" id="${item.func}_amount" placeholder="数量">${item.hint?`<span class="unit-hint">${item.hint}</span>`:''}<button onclick="handleAddressUintTokenCall('${item.func}')">设置</button>`;
-                    } else if (item.type === 'checkbox') {
-                        inputHtml = `<input type="checkbox" id="${item.func}" style="width:20px;height:20px;">`;
-                    } else if (item.type === 'input') {
-                        inputHtml = `<input type="text" id="${item.func}" placeholder="${item.hint||''}" style="width:100px;">`;
-                    }
-                    html += `<div class="row"><label>${item.label}</label>${inputHtml}</div>`;
-                }
-                html += `</div>`;
-            }
-            document.getElementById('panels').innerHTML = html;
-        }
-
-        waitForEthers(() => { loadAddress(); buildUI(); if (window.okxwallet || window.ethereum) document.getElementById('walletStatus').innerText = '🟢 钱包已检测到'; });
-    </script>
-</body>
-</html>
+            let html
