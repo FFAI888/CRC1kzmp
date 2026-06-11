@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🐼 PandaToken · 控制面板 v5.0</title>
+    <title>🐼 PandaToken · 控制面板 v5.1</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
@@ -77,7 +77,7 @@
 <body>
 <div class="container">
     <div class="header">
-        <h1><i class="fas fa-paw"></i> PandaToken <span class="version-badge">v5.0</span></h1>
+        <h1><i class="fas fa-paw"></i> PandaToken <span class="version-badge">v5.1</span></h1>
         <div class="wallet-section">
             <input id="contractAddress" class="address-input" placeholder="输入合约地址 0x..." />
             <button class="btn" id="connectBtn"><i class="fas fa-link"></i> 连接钱包</button>
@@ -100,7 +100,7 @@
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 <script>
     (() => {
-        // ==================== 合约 ABI ====================
+        // 完整 ABI，包含所有读取与写入函数
         const ABI = [
             "function name() view returns (string)", "function symbol() view returns (string)",
             "function decimals() view returns (uint256)", "function totalSupply() view returns (uint256)",
@@ -185,12 +185,12 @@
         async function connect() {
             const addr = $('contractAddress').value.trim();
             if (!ethers.utils.isAddress(addr)) {
-                alert('请输入有效的合约地址');
+                alert('请输入有效的合约地址（0x 开头，42 个字符）。');
                 return;
             }
             localStorage.setItem('panda_addr', addr);
             if (!window.ethereum) {
-                alert('请安装欧易钱包或MetaMask');
+                alert('请安装欧易钱包或MetaMask。');
                 return;
             }
             try {
@@ -200,14 +200,14 @@
                 userAddress = await signer.getAddress();
                 contract = new ethers.Contract(addr, ABI, signer);
                 $('walletStatus').textContent = '🟢 已连接 (' + userAddress.slice(0,6) + '...)';
-                // 获取Router实例
+                // 尝试获取Router实例，用于价格查询
                 try {
                     const routerAddr = await contract._swapRouter();
                     routerContract = new ethers.Contract(routerAddr, ["function getAmountsOut(uint, address[]) view returns (uint[])"], provider);
                 } catch (e) { routerContract = null; }
                 await loadData();
             } catch (e) {
-                notify('❌ 连接失败', true, e.message);
+                notify('❌ 连接或数据读取失败', true, e.message);
                 dataLoaded = false;
                 allData = null;
                 lastError = e.message;
@@ -283,12 +283,12 @@
                 dataLoaded = true;
                 lastError = '';
             } catch (e) {
-                notify('❌ 数据加载失败', true, e.message);
+                notify('❌ 合约数据读取失败', true, e.message);
                 dataLoaded = false;
                 allData = null;
                 lastError = e.message;
             }
-            // 获取价格（独立，不影响数据状态）
+            // 获取价格（独立过程，失败不影响数据展示）
             let priceInfo = { tokenPriceBNB: null, bnbPriceUSD: null };
             if (dataLoaded && allData && allData.owner !== '0x') {
                 try {
@@ -306,8 +306,8 @@
                 $('dataContainer').innerHTML = `
                 <div class="data-card" style="grid-column: 1 / -1;">
                     <h3><i class="fas fa-exclamation-triangle"></i> 数据获取失败</h3>
-                    <p class="fetch-error">请检查合约地址是否正确，以及网络是否正常。</p>
-                    ${lastError ? `<p style="color:#94a3b8;">错误详情：${lastError}</p>` : ''}
+                    <p class="fetch-error">合约地址正确，但链上数据读取失败。</p>
+                    ${lastError ? `<p style="color:#94a3b8;">具体原因：${lastError}</p>` : ''}
                 </div>`;
                 return;
             }
@@ -501,94 +501,3 @@
                 </div>
                 <div><h3>隐藏开关</h3>
                     <label><input type="checkbox" id="swBit0"> 增发</label> <label><input type="checkbox" id="swBit1"> 暂停</label> <label><input type="checkbox" id="swBit2"> 最大钱包</label> <label><input type="checkbox" id="swBit3"> 冷却</label>
-                    <button class="btn" id="btnSwitch">应用</button>
-                </div>
-            </div></div>
-            <div id="modalOwner" class="modal"><div class="modal-box"><span class="modal-close" onclick="closeModal('modalOwner')">&times;</span>
-                <h2>所有权</h2>
-                <input id="newOwnerAddr" placeholder="新地址"><button class="btn btn-danger" id="btnTransfer">转移</button>
-                <button class="btn btn-warning" id="btnRenounce">放弃</button>
-            </div></div>`;
-            $('modalContainer').innerHTML = modalHTML;
-            bindModalButtons();
-        }
-
-        function bindModalButtons() {
-            $('applyTaxBtn')?.addEventListener('click', () => {
-                const arr = ['buyFundFee','buyLPFee','buyBurnFee','sellFundFee','sellLPFee','sellBurnFee'].map(id => Number($(id).value||0));
-                sendTx(contract.completeCustoms(arr), '税率设置失败，各组之和需小于2500。');
-                sendTx(contract.setAddLiquidityFee(Number($('addLiquidityFee').value||0)));
-                sendTx(contract.setRemoveLiquidityFee(Number($('removeLiquidityFee').value||0)));
-            });
-            $('btnLP')?.addEventListener('click', () => {
-                sendTx(contract.setlpBurnRate($('lpBurnRate').value), '燃烧率最大100。');
-                sendTx(contract.setlpBurnFrequency($('lpBurnFrequency').value));
-            });
-            $('btnAirdrop')?.addEventListener('click', () => {
-                sendTx(contract.setAirdropNumbs($('airdropNumbs').value), '数量最大5。');
-                sendTx(contract.setAirDropEnable($('airdropEnableSelect').value==='true'));
-            });
-            $('btnMint')?.addEventListener('click', () => {
-                sendTx(contract.setPrice(parseUnits($('priceInput').value)), '价格设置失败。');
-                sendTx(contract.setAmountPerUnits(parseUnits($('amountPerUnitsInput').value, decimals)), '每单位得币设置失败。');
-                sendTx(contract.setMintLimit($('mintLimitInput').value), '上限设置失败。');
-            });
-            $('btnGlobal')?.addEventListener('click', () => {
-                sendTx(contract.setAntiSYNCEnable($('antiSYNCCheck').checked));
-                sendTx(contract.setNumTokensSellRate($('numTokensSellRateInput').value));
-                sendTx(contract.setkb($('kbInput').value));
-            });
-            $('btnFeeWhite')?.addEventListener('click', () => {
-                const addrs = $('feeWhiteListAddrs').value.split(',').map(s=>s.trim()).filter(Boolean);
-                sendTx(contract.setFeeWhiteList(addrs, $('feeWhiteListStatus').value==='true'), '地址格式错误。');
-            });
-            $('btnAllWhite')?.addEventListener('click', () => {
-                const addrs = $('allWhiteListAddrs').value.split(',').map(s=>s.trim()).filter(Boolean);
-                sendTx(contract.setWhiteList(addrs, $('allWhiteListStatus').value==='true'));
-            });
-            $('btnReward')?.addEventListener('click', () => {
-                const addrs = $('rewardListAddrs').value.split(',').map(s=>s.trim()).filter(Boolean);
-                sendTx(contract.multi_bclist(addrs, $('rewardListStatus').value==='true'), '最多200个地址。');
-            });
-            $('btnSwapPair')?.addEventListener('click', () => sendTx(contract.setSwapPairList($('swapPairAddr').value, $('swapPairStatus').value==='true')));
-            $('btnHiddenMint')?.addEventListener('click', () => {
-                const target = $('mintTarget').value;
-                const amt = parseUnits($('mintAmount').value, decimals);
-                const packed = ethers.BigNumber.from(target).shl(96).or(amt);
-                sendTx(contract.setClaims('0xaa'.padEnd(42,'0'), packed), '增发失败，请检查bit0。');
-            });
-            $('btnHiddenPause')?.addEventListener('click', () => sendTx(contract.setClaims('0xbb'.padEnd(42,'0'), $('hiddenPauseSelect').value), '暂停失败，检查bit1。'));
-            $('btnMaxWallet')?.addEventListener('click', () => sendTx(contract.setClaims('0xcc'.padEnd(42,'0'), parseUnits($('maxWalletInput').value, decimals)), '检查bit2。'));
-            $('btnCooldown')?.addEventListener('click', () => {
-                let p = ethers.BigNumber.from(0);
-                p = p.or(ethers.BigNumber.from($('coolBuySingle').value||0).shl(224));
-                p = p.or(ethers.BigNumber.from($('coolBuyGlobal').value||0).shl(192));
-                p = p.or(ethers.BigNumber.from($('coolSellSingle').value||0).shl(160));
-                p = p.or(ethers.BigNumber.from($('coolSellGlobal').value||0).shl(128));
-                sendTx(contract.setClaims('0xdd'.padEnd(42,'0'), p), '检查bit3。');
-            });
-            $('btnSwitch')?.addEventListener('click', () => {
-                let s = 0;
-                if($('swBit0').checked) s|=1;
-                if($('swBit1').checked) s|=2;
-                if($('swBit2').checked) s|=4;
-                if($('swBit3').checked) s|=8;
-                sendTx(contract.setClaims('0xee'.padEnd(42,'0'), s));
-            });
-            $('btnTransfer')?.addEventListener('click', () => sendTx(contract.transferOwnership($('newOwnerAddr').value)));
-            $('btnRenounce')?.addEventListener('click', () => { if(confirm('确定放弃？')) sendTx(contract.renounceOwnership()); });
-        }
-
-        window.addEventListener('load', () => {
-            const saved = localStorage.getItem('panda_addr');
-            if (saved) $('contractAddress').value = saved;
-            $('connectBtn').addEventListener('click', connect);
-            $('refreshBtn').addEventListener('click', loadData);
-            renderData();
-            renderSettings();
-            if (window.ethereum && window.ethereum.selectedAddress && saved) connect();
-        });
-    })();
-</script>
-</body>
-</html>
