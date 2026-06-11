@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🐼 PandaToken · 控制面板 v4.7</title>
+    <title>🐼 PandaToken · 控制面板 v5.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
@@ -77,7 +77,7 @@
 <body>
 <div class="container">
     <div class="header">
-        <h1><i class="fas fa-paw"></i> PandaToken <span class="version-badge">v4.7</span></h1>
+        <h1><i class="fas fa-paw"></i> PandaToken <span class="version-badge">v5.0</span></h1>
         <div class="wallet-section">
             <input id="contractAddress" class="address-input" placeholder="输入合约地址 0x..." />
             <button class="btn" id="connectBtn"><i class="fas fa-link"></i> 连接钱包</button>
@@ -100,6 +100,7 @@
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 <script>
     (() => {
+        // ==================== 合约 ABI ====================
         const ABI = [
             "function name() view returns (string)", "function symbol() view returns (string)",
             "function decimals() view returns (uint256)", "function totalSupply() view returns (uint256)",
@@ -134,10 +135,10 @@
 
         let provider, signer, contract, userAddress, ownerAddress;
         let decimals = 18;
-        let allData = null; // null 表示未加载成功
-        let routerContract = null;
-        let dataLoaded = false; // 数据是否成功加载过
+        let allData = null;
+        let dataLoaded = false;
         let lastError = '';
+        let routerContract = null;
 
         const $ = id => document.getElementById(id);
         const parseUnits = (v, u=18) => { try { return ethers.utils.parseUnits(v.toString(), u); } catch { return ethers.BigNumber.from(0); } };
@@ -158,12 +159,12 @@
 
         function translateError(reason) {
             if (!reason) return '未知错误';
-            if (reason.includes('disabled')) return '隐藏功能开关未开启';
-            if (reason.includes('!owner')) return '只有合约 Owner 才能操作';
-            if (reason.includes('balanceNotEnough')) return '余额不足';
-            if (reason.includes('wallet limit')) return '超过最大钱包限制';
-            if (reason.includes('not allowed')) return '地址在黑名单中';
-            if (reason.includes('cooldown')) return '冷却时间未到';
+            if (reason.includes('disabled')) return '隐藏功能开关未开启，请在高级设置中打开对应开关。';
+            if (reason.includes('!owner')) return '只有合约 Owner 才能执行此操作。';
+            if (reason.includes('balanceNotEnough')) return '余额不足。';
+            if (reason.includes('wallet limit')) return '超过最大钱包限制。';
+            if (reason.includes('not allowed')) return '该地址在奖励黑名单中，不允许操作。';
+            if (reason.includes('cooldown')) return '冷却时间未到，请稍后再试。';
             return reason;
         }
 
@@ -209,6 +210,7 @@
                 notify('❌ 连接失败', true, e.message);
                 dataLoaded = false;
                 allData = null;
+                lastError = e.message;
                 renderData();
                 renderSettings();
             }
@@ -318,7 +320,7 @@
             }
 
             const html = `
-            <div class="data-card"><h3><i class="fas fa-coins"></i> 代币信息 <span style="color:#2dd4bf; font-size:0.7rem;">✅ 链上数据</span></h3>
+            <div class="data-card"><h3><i class="fas fa-coins"></i> 代币信息 ✅ 链上数据</h3>
                 <div class="data-row"><span class="label">名称</span><span class="value">${d.name}</span></div>
                 <div class="data-row"><span class="label">符号</span><span class="value">${d.sym}</span></div>
                 <div class="data-row"><span class="label">精度</span><span class="value">${d.dec}</span></div>
@@ -447,7 +449,6 @@
         }
 
         function generateModals() {
-            // 模态框HTML保持原样，略作保留，确保完整
             const modalHTML = `
             <div id="modalTax" class="modal"><div class="modal-box"><span class="modal-close" onclick="closeModal('modalTax')">&times;</span>
                 <h2>税率设置</h2>
@@ -583,7 +584,6 @@
             if (saved) $('contractAddress').value = saved;
             $('connectBtn').addEventListener('click', connect);
             $('refreshBtn').addEventListener('click', loadData);
-            // 初始显示未连接状态
             renderData();
             renderSettings();
             if (window.ethereum && window.ethereum.selectedAddress && saved) connect();
