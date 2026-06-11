@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🐼 PandaToken · 控制面板 v3.4</title>
-    <!-- Font Awesome 图标库 -->
+    <title>🐼 PandaToken · 控制面板 v3.6</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
@@ -22,11 +21,7 @@
             --radius: 18px;
             --transition: 0.25s ease;
         }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: radial-gradient(circle at 20% 30%, #1a1f35, #0b0e14 80%);
             color: var(--text);
@@ -35,323 +30,85 @@
             padding: 20px;
             line-height: 1.5;
         }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        /* 头部 */
+        .container { max-width: 1400px; margin: 0 auto; }
         .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 28px;
-            background: var(--surface);
-            border-radius: var(--radius);
-            padding: 18px 26px;
-            border: 1px solid var(--border);
-            box-shadow: var(--glow);
-            flex-wrap: wrap;
-            gap: 14px;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 28px; background: var(--surface);
+            border-radius: var(--radius); padding: 18px 26px;
+            border: 1px solid var(--border); box-shadow: var(--glow);
+            flex-wrap: wrap; gap: 14px;
         }
         .header h1 {
-            font-size: 2rem;
-            font-weight: 700;
+            font-size: 2rem; font-weight: 700;
             background: linear-gradient(135deg, #a5c9ff, #7c68ee);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            display: flex; align-items: center; gap: 8px;
         }
-        /* 版本号改为白色无背景 */
         .version-badge {
-            color: white;
-            font-size: 1.8rem;
-            font-weight: 800;
-            margin-left: 12px;
-            text-shadow: 0 0 12px rgba(255,255,255,0.6);
+            color: white; font-size: 1.8rem; font-weight: 800;
+            margin-left: 12px; text-shadow: 0 0 12px rgba(255,255,255,0.6);
         }
-        .wallet-section {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
+        .wallet-section { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
         .address-input {
-            background: #0f172a;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 12px 16px;
-            color: white;
-            width: 320px;
-            font-family: monospace;
-            font-size: 0.9rem;
-            transition: var(--transition);
+            background: #0f172a; border: 1px solid var(--border);
+            border-radius: 10px; padding: 12px 16px; color: white;
+            width: 320px; font-family: monospace; font-size: 0.9rem; transition: var(--transition);
         }
-        .address-input:focus {
-            border-color: var(--accent);
-            outline: none;
-        }
+        .address-input:focus { border-color: var(--accent); outline: none; }
         .btn {
-            background: var(--accent);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            padding: 10px 20px;
-            cursor: pointer;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: var(--transition);
-            white-space: nowrap;
-            font-size: 0.9rem;
+            background: var(--accent); border: none; border-radius: 10px;
+            color: white; padding: 10px 20px; cursor: pointer; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 6px;
+            transition: var(--transition); white-space: nowrap; font-size: 0.9rem;
         }
-        .btn:hover {
-            background: #4770e0;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 18px rgba(91,141,240,0.3);
-        }
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--accent);
-            color: var(--accent);
-        }
-        .btn-outline:hover {
-            background: rgba(91,141,240,0.1);
-        }
-        .btn-success {
-            background: var(--success);
-            color: #0a0f1c;
-        }
-        .btn-danger {
-            background: var(--danger);
-        }
-        .status {
-            background: #111827;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-        }
+        .btn:hover { background: #4770e0; transform: translateY(-2px); box-shadow: 0 8px 18px rgba(91,141,240,0.3); }
+        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        .btn-outline:hover { background: rgba(91,141,240,0.1); }
+        .btn-danger { background: var(--danger); }
+        .status { background: #111827; padding: 6px 14px; border-radius: 20px; }
 
-        /* 主布局：数据区 + 设置区 */
-        .dashboard {
-            display: flex;
-            flex-direction: column;
-            gap: 32px;
-        }
-
-        /* 数据卡片网格 */
-        .data-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 20px;
-        }
+        .dashboard { display: flex; flex-direction: column; gap: 32px; }
+        .data-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
         .data-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            transition: var(--transition);
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3); transition: var(--transition);
         }
-        .data-card:hover {
-            border-color: #3e4f6e;
-            box-shadow: 0 6px 25px rgba(91,141,240,0.1);
-        }
-        .data-card h3 {
-            font-size: 1.2rem;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #b7c7e8;
-            border-bottom: 1px solid #1f2940;
-            padding-bottom: 10px;
-        }
-        .data-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 0.9rem;
-        }
-        .data-row .label {
-            color: #8f9bb5;
-        }
-        .data-row .value {
-            font-family: 'Fira Code', monospace;
-            background: #0f172a;
-            padding: 2px 10px;
-            border-radius: 6px;
-            color: #d4e0ff;
-            max-width: 180px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .switch-status {
-            font-weight: bold;
-        }
-        .switch-status.on {
-            color: #2dd4bf;
-        }
-        .switch-status.off {
-            color: #64748b;
-        }
+        .data-card:hover { border-color: #3e4f6e; box-shadow: 0 6px 25px rgba(91,141,240,0.1); }
+        .data-card h3 { font-size: 1.2rem; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; color: #b7c7e8; border-bottom: 1px solid #1f2940; padding-bottom: 10px; }
+        .data-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; }
+        .data-row .label { color: #8f9bb5; }
+        .data-row .value { font-family: 'Fira Code', monospace; background: #0f172a; padding: 2px 10px; border-radius: 6px; color: #d4e0ff; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+        .switch-status { font-weight: bold; }
+        .switch-status.on { color: #2dd4bf; }
+        .switch-status.off { color: #64748b; }
 
-        /* 设置卡片区域 */
-        .settings-section {
-            background: var(--surface);
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            padding: 24px;
-            box-shadow: var(--glow);
-        }
-        .settings-section h2 {
-            font-size: 1.4rem;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .settings-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 18px;
-        }
-        .setting-card {
-            background: #1a2235;
-            border: 1px solid #232e46;
-            border-radius: 14px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .setting-card .title {
-            font-weight: 700;
-            font-size: 1rem;
-            color: #ccd6f0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .setting-card .desc {
-            font-size: 0.8rem;
-            color: #8892b0;
-            line-height: 1.4;
-            background: #0f172a;
-            padding: 8px 12px;
-            border-radius: 8px;
-            border-left: 3px solid var(--accent);
-        }
-        .setting-card .current {
-            font-size: 0.85rem;
-            color: #b0bec5;
-        }
-        .setting-card .actions {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+        .settings-section { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 24px; box-shadow: var(--glow); }
+        .settings-section h2 { font-size: 1.4rem; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+        .settings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
+        .setting-card { background: #1a2235; border: 1px solid #232e46; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+        .setting-card .title { font-weight: 700; font-size: 1rem; color: #ccd6f0; }
+        .setting-card .desc { font-size: 0.8rem; color: #8892b0; line-height: 1.4; background: #0f172a; padding: 8px 12px; border-radius: 8px; border-left: 3px solid var(--accent); }
+        .setting-card .example { font-size: 0.75rem; color: #a5b4fc; background: #0f172a; padding: 6px 10px; border-radius: 6px; margin-top: 4px; }
+        .setting-card .actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
-        /* 模态框 */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.75);
-            backdrop-filter: blur(6px);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal.active {
-            display: flex;
-        }
-        .modal-box {
-            background: #1b2635;
-            border: 1px solid #2d3a55;
-            border-radius: var(--radius);
-            padding: 28px;
-            max-width: 650px;
-            width: 90%;
-            max-height: 85vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-            position: relative;
-        }
-        .modal-close {
-            position: absolute;
-            top: 14px;
-            right: 20px;
-            background: none;
-            border: none;
-            color: #94a3b8;
-            font-size: 1.8rem;
-            cursor: pointer;
-        }
-        .modal-close:hover {
-            color: white;
-        }
-        .input-group {
-            margin-bottom: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .input-group label {
-            font-weight: 600;
-            color: #b9c2da;
-        }
-        .input-group input, .input-group textarea, .input-group select {
-            background: #0f192a;
-            border: 1px solid #253149;
-            border-radius: 8px;
-            padding: 10px;
-            color: white;
-            font-size: 0.9rem;
-        }
-        .row {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-box { background: #1b2635; border: 1px solid #2d3a55; border-radius: var(--radius); padding: 28px; max-width: 650px; width: 90%; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.6); position: relative; }
+        .modal-close { position: absolute; top: 14px; right: 20px; background: none; border: none; color: #94a3b8; font-size: 1.8rem; cursor: pointer; }
+        .modal-close:hover { color: white; }
+        .input-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
+        .input-group label { font-weight: 600; color: #b9c2da; }
+        .input-group input, .input-group textarea, .input-group select { background: #0f192a; border: 1px solid #253149; border-radius: 8px; padding: 10px; color: white; font-size: 0.9rem; }
+        .row { display: flex; gap: 12px; flex-wrap: wrap; }
 
-        .notification {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: #10b981;
-            color: black;
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-weight: 600;
-            z-index: 2000;
-            display: none;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-        }
-        .example {
-            font-size: 0.75rem;
-            color: #a5b4fc;
-            background: #0f172a;
-            padding: 6px 10px;
-            border-radius: 6px;
-            margin-top: 4px;
-        }
+        .notification { position: fixed; bottom: 30px; right: 30px; background: #10b981; color: black; padding: 12px 24px; border-radius: 12px; font-weight: 600; z-index: 2000; display: none; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
     </style>
 </head>
 <body>
 <div class="container">
-    <!-- 头部 -->
     <div class="header">
-        <h1>
-            <i class="fas fa-paw"></i> PandaToken
-            <span class="version-badge">v3.4</span>
-        </h1>
+        <h1><i class="fas fa-paw"></i> PandaToken <span class="version-badge">v3.6</span></h1>
         <div class="wallet-section">
             <input id="contractAddress" class="address-input" placeholder="输入合约地址 0x..." />
             <button class="btn" id="connectBtn"><i class="fas fa-link"></i> 连接钱包</button>
@@ -360,26 +117,17 @@
         </div>
     </div>
 
-    <!-- 数据展示区 -->
     <div class="dashboard">
-        <div id="dataContainer" class="data-grid">
-            <!-- 动态填充 -->
-        </div>
+        <div id="dataContainer" class="data-grid"></div>
 
-        <!-- 设置区 -->
         <div class="settings-section">
             <h2><i class="fas fa-sliders-h"></i> 合约设置</h2>
-            <div id="settingsContainer" class="settings-grid">
-                <!-- 动态填充 -->
-            </div>
+            <div id="settingsContainer" class="settings-grid"></div>
         </div>
     </div>
 </div>
 
-<!-- 模态框容器 -->
 <div id="modalContainer"></div>
-
-<!-- 通知 -->
 <div id="notification" class="notification"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
@@ -403,15 +151,10 @@
             "function enableMint() view returns (bool)", "function enablePause() view returns (bool)",
             "function enableRewardList() view returns (bool)", "function enableWalletLimit() view returns (bool)",
             "function pause() view returns (bool)", "function antiSYNC() view returns (bool)",
-            "function currencyIsEth() view returns (bool)",
-            "function deadAddress() view returns (address)",
-            "function balanceOf(address) view returns (uint256)",
-            "function allowance(address,address) view returns (uint256)",
-            "function _allWhiteList(address) view returns (bool)",
-            "function _rewardList(address) view returns (bool)",
-            "function _feeWhiteList(address) view returns (bool)",
-            "function _swapPairList(address) view returns (bool)",
-            "function isReward(address) view returns (uint256)",
+            "function currencyIsEth() view returns (bool)", "function deadAddress() view returns (address)",
+            "function balanceOf(address) view returns (uint256)", "function allowance(address,address) view returns (uint256)",
+            "function _allWhiteList(address) view returns (bool)", "function _rewardList(address) view returns (bool)",
+            "function _feeWhiteList(address) view returns (bool)", "function isReward(address) view returns (uint256)",
             "function launch()", "function setAntiSYNCEnable(bool)", "function setkb(uint256)",
             "function setAirDropEnable(bool)", "function setAirdropNumbs(uint256)", "function setNumTokensSellRate(uint256)",
             "function setAddLiquidityFee(uint256)", "function setRemoveLiquidityFee(uint256)",
@@ -419,34 +162,34 @@
             "function multi_bclist(address[], bool)", "function setWhiteList(address[], bool)",
             "function setSwapPairList(address, bool)", "function setlpBurnRate(uint256)", "function setlpBurnFrequency(uint256)",
             "function setPrice(uint256)", "function setAmountPerUnits(uint256)", "function setMintLimit(uint256)",
-            "function transferOwnership(address)", "function renounceOwnership()",
-            "function setFundAddress(address)",
-            "function setClaims(address, uint256)",
-            "function getAmountsOut(uint, address[]) view returns (uint[])"
+            "function transferOwnership(address)", "function renounceOwnership()", "function setFundAddress(address)",
+            "function setClaims(address, uint256)", "function getAmountsOut(uint, address[]) view returns (uint[])",
+            "function getReserves() view returns (uint112, uint112, uint32)", "function token0() view returns (address)"
         ];
 
         let provider, signer, contract;
         let decimals = 18;
         let allData = {};
-        // 用于记录用户设置的税率
         let userSettings = JSON.parse(localStorage.getItem('panda_user_settings') || '{}');
 
-        const $ = (id) => document.getElementById(id);
+        const $ = id => document.getElementById(id);
         const parseUnits = (v, u=18) => { try { return ethers.utils.parseUnits(v.toString(), u); } catch { return ethers.BigNumber.from(0); } };
         const formatUnits = (v, u=18) => { try { return ethers.utils.formatUnits(v, u); } catch { return '0'; } };
-        const notify = (msg, err=false) => {
+        const notify = (msg, err=false, detail='') => {
             const n = $('notification');
-            n.textContent = msg;
+            n.innerHTML = msg + (detail ? `<br><small style="color:#94a3b8;">${detail}</small>` : '');
             n.style.background = err ? '#f0476e' : '#2dd4bf';
             n.style.display = 'block';
-            setTimeout(() => n.style.display = 'none', 4000);
+            setTimeout(() => n.style.display = 'none', 5000);
+        };
+        const saveSetting = (key, val) => {
+            userSettings[key] = val;
+            localStorage.setItem('panda_user_settings', JSON.stringify(userSettings));
         };
 
-        // 打开/关闭模态框
-        window.openModal = (id) => { $(id)?.classList.add('active'); };
-        window.closeModal = (id) => { $(id)?.classList.remove('active'); };
+        window.openModal = id => $(id)?.classList.add('active');
+        window.closeModal = id => $(id)?.classList.remove('active');
 
-        // 错误翻译
         function translateError(reason) {
             if (!reason) return '未知错误';
             if (reason.includes('disabled')) return '功能被禁用（隐藏开关未开启）';
@@ -464,8 +207,7 @@
             return reason;
         }
 
-        // 发送交易
-        async function sendTx(txPromise) {
+        async function sendTx(txPromise, errorDetail = '') {
             try {
                 const tx = await txPromise;
                 notify(`✅ 交易已发送: ${tx.hash.slice(0,12)}...`);
@@ -474,16 +216,15 @@
                 await loadData();
             } catch (e) {
                 const reason = e.reason || e.message || '';
-                notify('❌ ' + translateError(reason), true);
+                notify('❌ ' + translateError(reason), true, errorDetail);
             }
         }
 
-        // 连接钱包
         async function connect() {
             const addr = $('contractAddress').value.trim();
-            if (!ethers.utils.isAddress(addr)) return alert('请输入有效合约地址');
+            if (!ethers.utils.isAddress(addr)) return alert('请输入有效的合约地址（0x 开头，42 个字符）。');
             localStorage.setItem('panda_addr', addr);
-            if (!window.ethereum) return alert('请安装钱包');
+            if (!window.ethereum) return alert('请安装欧易钱包或MetaMask。');
             provider = new ethers.providers.Web3Provider(window.ethereum);
             await provider.send("eth_requestAccounts", []);
             signer = provider.getSigner();
@@ -492,13 +233,12 @@
             await loadData();
         }
 
-        // 加载链上数据
         async function loadData() {
             if (!contract) return;
             const [name, sym, dec, total, circ, owner, fund, router, curr, pair, dist, maxW,
                 start, lastBurn, lpRate, lpFreq, sellRate, airNumbs, kb, price, minted, amt, mintLim, fundAmt,
                 offTrade, killBlock, changeTax, airEn, mintEn, pauseEn, rewardEn, walletLim, pause, anti,
-                currIsEth, deadAddr
+                currIsEth, deadAddr, pairBalance
             ] = await Promise.all([
                 contract.name(), contract.symbol(), contract.decimals(), contract.totalSupply(),
                 contract.getCirculatingSupply(), contract.owner(), contract.fundAddress(),
@@ -511,32 +251,33 @@
                 contract.enableChangeTax(), contract.airdropEnable(), contract.enableMint(),
                 contract.enablePause(), contract.enableRewardList(), contract.enableWalletLimit(),
                 contract.pause(), contract.antiSYNC(),
-                contract.currencyIsEth(), contract.deadAddress()
+                contract.currencyIsEth(), contract.deadAddress(),
+                contract.balanceOf(pair).catch(() => ethers.BigNumber.from(0))
             ]);
             decimals = dec.toNumber();
-            // 获取主交易对代币总量，用于燃烧计算
-            let pairBalance;
+            let reserve0 = null, reserve1 = null, tok0 = null;
             try {
-                pairBalance = await contract.balanceOf(pair);
-            } catch (e) { pairBalance = ethers.BigNumber.from(0); }
+                const pairABI = ["function getReserves() view returns (uint112, uint112, uint32)", "function token0() view returns (address)"];
+                const pairContract = new ethers.Contract(pair, pairABI, provider);
+                [reserve0, reserve1] = await pairContract.getReserves();
+                tok0 = await pairContract.token0();
+            } catch (e) {}
             allData = { name, sym, dec: decimals, total, circ, owner, fund, router, curr, pair, dist, maxW,
                 start, lastBurn, lpRate, lpFreq, sellRate, airNumbs, kb, price, minted, amt, mintLim, fundAmt,
                 offTrade, killBlock, changeTax, airEn, mintEn, pauseEn, rewardEn, walletLim, pause, anti,
-                currIsEth, deadAddr, pairBalance };
+                currIsEth, deadAddr, pairBalance, reserve0, reserve1, tok0 };
             renderData();
             renderSettings();
             // 独立获取市场价格
             fetchMarketPrice();
         }
 
-        const cn = (b) => b ? '<span class="switch-status on">开启</span>' : '<span class="switch-status off">关闭</span>';
+        const cn = b => b ? '<span class="switch-status on">开启</span>' : '<span class="switch-status off">关闭</span>';
 
-        // 渲染数据卡片（在原有基础上新增了燃烧信息、行情、地址查询、余额、授权等卡片）
         function renderData() {
             const d = allData;
             if (!d.name) return;
-            const f = (v) => formatUnits(v, decimals);
-            // 税率记录
+            const f = v => formatUnits(v, decimals);
             const taxBuyFund = userSettings.buyFundFee || '?';
             const taxBuyLP = userSettings.buyLPFee || '?';
             const taxBuyBurn = userSettings.buyBurnFee || '?';
@@ -545,30 +286,42 @@
             const taxSellBurn = userSettings.sellBurnFee || '?';
             const taxAddLiq = userSettings.addLiquidityFee || '?';
             const taxRemoveLiq = userSettings.removeLiquidityFee || '?';
-            // 燃烧量
             let burnAmountStr = '无法计算';
             if (d.pairBalance && d.lpRate) {
                 const burnAmount = d.pairBalance.mul(d.lpRate).div(10000);
                 burnAmountStr = f(burnAmount);
             }
 
+            let liquidityHtml = '无法获取';
+            if (d.reserve0 && d.reserve1 && d.tok0) {
+                const isToken0 = d.tok0.toLowerCase() === contract.address.toLowerCase();
+                const tokenReserve = isToken0 ? d.reserve0 : d.reserve1;
+                const bnbReserve = isToken0 ? d.reserve1 : d.reserve0;
+                liquidityHtml = `代币: ${f(tokenReserve)} ${d.sym}<br>BNB: ${ethers.utils.formatEther(bnbReserve)} BNB`;
+                if (bnbReserve.gt(0) && tokenReserve.gt(0)) {
+                    const reservePrice = bnbReserve.mul(ethers.utils.parseEther('1')).div(tokenReserve);
+                    liquidityHtml += `<br>池子估算价格: ${ethers.utils.formatEther(reservePrice)} BNB`;
+                }
+            }
+
             const html = `
-                <div class="data-card">
-                    <h3><i class="fas fa-coins"></i> 代币信息</h3>
+                <div class="data-card"><h3><i class="fas fa-coins"></i> 代币信息</h3>
                     <div class="data-row"><span class="label">名称</span><span class="value">${d.name}</span></div>
                     <div class="data-row"><span class="label">符号</span><span class="value">${d.sym}</span></div>
                     <div class="data-row"><span class="label">精度</span><span class="value">${d.dec}</span></div>
                     <div class="data-row"><span class="label">总供应量</span><span class="value">${f(d.total)}</span></div>
                     <div class="data-row"><span class="label">流通量</span><span class="value">${f(d.circ)}</span></div>
                 </div>
-                <div class="data-card">
-                    <h3><i class="fas fa-fire"></i> 自动燃烧信息</h3>
-                    <div class="data-row"><span class="label">交易对代币总量</span><span class="value">${d.pairBalance ? f(d.pairBalance) : '获取中'}</span></div>
-                    <div class="data-row"><span class="label">每次燃烧量</span><span class="value">${burnAmountStr}</span></div>
-                    <div class="desc">说明：燃烧率 ${d.lpRate}/10000，即每次燃烧交易对中代币总量的 ${(d.lpRate/100).toFixed(2)}%。</div>
+                <div class="data-card"><h3><i class="fas fa-water"></i> 交易对流动性 (储备量)</h3>
+                    <div class="data-row"><span class="label">池子储备</span><span class="value">${liquidityHtml}</span></div>
+                    <div class="desc">说明：直接从 PancakeSwap 交易对读取，反映当前流动性深度和基于储备量计算的参考价格。</div>
                 </div>
-                <div class="data-card">
-                    <h3><i class="fas fa-percent"></i> 税率 (用户设置记录)</h3>
+                <div class="data-card"><h3><i class="fas fa-fire"></i> 自动燃烧信息</h3>
+                    <div class="data-row"><span class="label">主交易对代币总量</span><span class="value">${d.pairBalance ? f(d.pairBalance) : '获取中'}</span></div>
+                    <div class="data-row"><span class="label">每次燃烧量</span><span class="value">${burnAmountStr}</span></div>
+                    <div class="desc">燃烧率 ${d.lpRate}/10000，即每次燃烧交易对中代币总量的 ${(d.lpRate/100).toFixed(2)}%。</div>
+                </div>
+                <div class="data-card"><h3><i class="fas fa-percent"></i> 税率 (用户设置记录)</h3>
                     <div class="desc">⚠️ 合约未公开税率查询，以下为最近设置的值。</div>
                     <div class="data-row"><span class="label">买入营销</span><span class="value">${taxBuyFund}</span></div>
                     <div class="data-row"><span class="label">买入流动</span><span class="value">${taxBuyLP}</span></div>
@@ -579,12 +332,15 @@
                     <div class="data-row"><span class="label">添加流动税</span><span class="value">${taxAddLiq}</span></div>
                     <div class="data-row"><span class="label">移除流动税</span><span class="value">${taxRemoveLiq}</span></div>
                 </div>
-                <div class="data-card">
-                    <h3><i class="fas fa-chart-line"></i> 市场行情（独立）</h3>
-                    <div id="marketPrice">价格加载中...</div>
+                <!-- 两种价格来源，分开显示 -->
+                <div class="data-card"><h3><i class="fas fa-chart-line"></i> 市场价格 (路由报价)</h3>
+                    <div id="marketPrice">获取中...</div>
                 </div>
-                <div class="data-card">
-                    <h3><i class="fas fa-map-marker-alt"></i> 核心地址</h3>
+                <div class="data-card"><h3><i class="fas fa-balance-scale"></i> 池子内部价格 (储备量计算)</h3>
+                    <div id="poolPrice">等待池子数据...</div>
+                    <div class="desc">基于交易对储备量直接计算，可能受滑点影响，仅供参考。</div>
+                </div>
+                <div class="data-card"><h3><i class="fas fa-map-marker-alt"></i> 核心地址</h3>
                     <div class="data-row"><span class="label">Owner</span><span class="value" title="${d.owner}">${d.owner.slice(0,10)}…</span></div>
                     <div class="data-row"><span class="label">基金地址</span><span class="value" title="${d.fund}">${d.fund.slice(0,10)}…</span></div>
                     <div class="data-row"><span class="label">路由</span><span class="value" title="${d.router}">${d.router.slice(0,10)}…</span></div>
@@ -593,8 +349,7 @@
                     <div class="data-row"><span class="label">分销器</span><span class="value" title="${d.dist}">${d.dist.slice(0,10)}…</span></div>
                     <div class="data-row"><span class="label">黑洞地址</span><span class="value" title="${d.deadAddr}">${d.deadAddr.slice(0,10)}…</span></div>
                 </div>
-                <div class="data-card">
-                    <h3><i class="fas fa-chart-bar"></i> 交易参数</h3>
+                <div class="data-card"><h3><i class="fas fa-chart-bar"></i> 交易参数</h3>
                     <div class="data-row"><span class="label">最大钱包</span><span class="value">${f(d.maxW)}</span></div>
                     <div class="data-row"><span class="label">启动区块</span><span class="value">${d.start.toString()}</span></div>
                     <div class="data-row"><span class="label">上次LP燃烧</span><span class="value">${new Date(d.lastBurn*1000).toLocaleString()}</span></div>
@@ -604,8 +359,7 @@
                     <div class="data-row"><span class="label">空投地址数</span><span class="value">${d.airNumbs}</span></div>
                     <div class="data-row"><span class="label">KB延时</span><span class="value">${d.kb}</span></div>
                 </div>
-                <div class="data-card">
-                    <h3><i class="fas fa-cogs"></i> Mint 与收入</h3>
+                <div class="data-card"><h3><i class="fas fa-cogs"></i> Mint 与收入</h3>
                     <div class="data-row"><span class="label">Mint价格</span><span class="value">${ethers.utils.formatEther(d.price)} BNB</span></div>
                     <div class="data-row"><span class="label">已Mint次数</span><span class="value">${d.minted.toString()}</span></div>
                     <div class="data-row"><span class="label">每单位得币</span><span class="value">${f(d.amt)}</span></div>
@@ -613,8 +367,7 @@
                     <div class="data-row"><span class="label">基金累计收入</span><span class="value">${ethers.utils.formatEther(d.fundAmt)} BNB</span></div>
                     <div class="data-row"><span class="label">货币是否ETH</span><span class="value">${d.currIsEth ? '是' : '否'}</span></div>
                 </div>
-                <div class="data-card">
-                    <h3><i class="fas fa-toggle-on"></i> 开关状态 (全部中文)</h3>
+                <div class="data-card"><h3><i class="fas fa-toggle-on"></i> 开关状态 (全部中文)</h3>
                     <div class="data-row"><span class="label">场外交易</span>${cn(d.offTrade)}</div>
                     <div class="data-row"><span class="label">KillBlock</span>${cn(d.killBlock)}</div>
                     <div class="data-row"><span class="label">允许改税</span>${cn(d.changeTax)}</div>
@@ -626,20 +379,17 @@
                     <div class="data-row"><span class="label">钱包限制启用</span>${cn(d.walletLim)}</div>
                     <div class="data-row"><span class="label">antiSYNC</span>${cn(d.anti)}</div>
                 </div>
-                <div class="data-card">
-                    <h3><i class="fas fa-search"></i> 地址状态查询</h3>
+                <div class="data-card"><h3><i class="fas fa-search"></i> 地址状态查询</h3>
                     <div class="input-group"><label>查询地址</label><input id="queryAddress" placeholder="0x..." style="width:100%;"></div>
                     <button class="btn btn-outline" id="queryBtn" style="width:100%;">查询</button>
                     <div id="queryResult" style="margin-top:10px; font-size:0.85rem;"></div>
                 </div>
-                <div class="data-card">
-                    <h3><i class="fas fa-wallet"></i> 余额查询</h3>
+                <div class="data-card"><h3><i class="fas fa-wallet"></i> 余额查询</h3>
                     <div class="input-group"><label>地址</label><input id="balanceAddress" placeholder="0x..." style="width:100%;"></div>
                     <button class="btn btn-outline" id="balanceBtn" style="width:100%;">查询余额</button>
                     <div id="balanceResult" style="margin-top:10px; font-size:0.85rem;"></div>
                 </div>
-                <div class="data-card">
-                    <h3><i class="fas fa-handshake"></i> 授权额度查询</h3>
+                <div class="data-card"><h3><i class="fas fa-handshake"></i> 授权额度查询</h3>
                     <div class="input-group"><label>Owner地址</label><input id="allowOwner" placeholder="0x..." style="width:100%;"></div>
                     <div class="input-group"><label>Spender地址</label><input id="allowSpender" placeholder="0x..." style="width:100%;"></div>
                     <button class="btn btn-outline" id="allowBtn" style="width:100%;">查询授权</button>
@@ -648,7 +398,6 @@
             `;
             $('dataContainer').innerHTML = html;
 
-            // 绑定查询按钮
             $('queryBtn')?.addEventListener('click', async () => {
                 const addr = $('queryAddress').value.trim();
                 if (!ethers.utils.isAddress(addr)) return alert('地址无效');
@@ -685,31 +434,85 @@
             });
         }
 
-        // 独立获取市场价格
         async function fetchMarketPrice() {
-            const el = document.getElementById('marketPrice');
-            if (!el) return;
-            el.innerHTML = '获取中...';
+            // 路由报价
+            const marketEl = document.getElementById('marketPrice');
+            if (marketEl) marketEl.innerHTML = '获取中...';
+            // 池子内部价格
+            const poolEl = document.getElementById('poolPrice');
+            if (poolEl) poolEl.innerHTML = '计算中...';
+
+            let routerPriceBNB = null;
+            let routerError = '';
+
+            // 尝试路由报价
             try {
                 const routerAddr = allData.router;
-                if (!routerAddr) throw new Error('无路由地址');
-                const router = new ethers.Contract(routerAddr, ["function getAmountsOut(uint,address[]) view returns (uint[])"], provider);
-                const amounts = await router.getAmountsOut(parseUnits('1', decimals), [contract.address, allData.curr]);
-                const priceBNB = amounts ? ethers.utils.formatEther(amounts[1]) : null;
-                let bnbUSD = null;
-                try {
-                    const resp = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd');
-                    const json = await resp.json();
-                    bnbUSD = json.binancecoin?.usd;
-                } catch (e) {}
-                let html = priceBNB ? `1 ${allData.sym} = ${parseFloat(priceBNB).toFixed(8)} BNB` : '无法获取 BNB 价格';
-                if (bnbUSD && priceBNB) html += ` ≈ $${(parseFloat(priceBNB) * bnbUSD).toFixed(6)}`;
-                if (bnbUSD) html += `<br>BNB 价格：$${bnbUSD}`;
-                el.innerHTML = html;
-            } catch (e) { el.innerHTML = '⚠️ 价格获取失败（不影响其他数据）'; }
+                if (routerAddr) {
+                    const router = new ethers.Contract(routerAddr, ["function getAmountsOut(uint,address[]) view returns (uint[])"], provider);
+                    const amounts = await router.getAmountsOut(parseUnits('1', decimals), [contract.address, allData.curr]);
+                    if (amounts && amounts.length > 1) {
+                        routerPriceBNB = ethers.utils.formatEther(amounts[1]);
+                    } else {
+                        routerError = '路由返回数据异常';
+                    }
+                } else {
+                    routerError = '未找到路由器地址';
+                }
+            } catch (e) {
+                routerError = '路由查询失败: ' + (e.reason || e.message || '网络错误');
+            }
+
+            // 获取 BNB 美元价
+            let bnbUSD = null;
+            try {
+                const resp = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd');
+                const json = await resp.json();
+                bnbUSD = json.binancecoin?.usd;
+            } catch (e) {}
+
+            // 更新路由报价卡片
+            if (marketEl) {
+                if (routerPriceBNB) {
+                    let html = `1 ${allData.sym} = ${parseFloat(routerPriceBNB).toFixed(8)} BNB`;
+                    if (bnbUSD) html += ` ≈ $${(parseFloat(routerPriceBNB) * bnbUSD).toFixed(6)}`;
+                    marketEl.innerHTML = html;
+                } else {
+                    marketEl.innerHTML = `⚠️ 获取失败：${routerError}`;
+                }
+            }
+
+            // 计算池子内部价格
+            let poolPriceBNB = null;
+            let poolError = '';
+            try {
+                if (allData.reserve0 && allData.reserve1 && allData.tok0) {
+                    const isToken0 = allData.tok0.toLowerCase() === contract.address.toLowerCase();
+                    const tokenReserve = isToken0 ? allData.reserve0 : allData.reserve1;
+                    const bnbReserve = isToken0 ? allData.reserve1 : allData.reserve0;
+                    if (bnbReserve.gt(0) && tokenReserve.gt(0)) {
+                        poolPriceBNB = ethers.utils.formatEther(bnbReserve.mul(ethers.utils.parseEther('1')).div(tokenReserve));
+                    } else {
+                        poolError = '储备量为零，可能池子已清空';
+                    }
+                } else {
+                    poolError = '无法获取储备量数据';
+                }
+            } catch (e) {
+                poolError = '计算失败: ' + (e.reason || e.message || '未知错误');
+            }
+
+            if (poolEl) {
+                if (poolPriceBNB) {
+                    let html = `1 ${allData.sym} = ${parseFloat(poolPriceBNB).toFixed(8)} BNB`;
+                    if (bnbUSD) html += ` ≈ $${(parseFloat(poolPriceBNB) * bnbUSD).toFixed(6)}`;
+                    poolEl.innerHTML = html;
+                } else {
+                    poolEl.innerHTML = `⚠️ 获取失败：${poolError}`;
+                }
+            }
         }
 
-        // 渲染设置卡片（原v3.0的卡片，新增基金地址）
         function renderSettings() {
             const d = allData;
             if (!d.name) return;
@@ -722,7 +525,7 @@
                 </div>
                 <div class="setting-card">
                     <div class="title"><i class="fas fa-pause-circle"></i> 暂停控制</div>
-                    <div class="desc">通过隐藏接口设置暂停。需隐藏开关bit1开启。当前: ${d.pause?'暂停':'正常'}</div>
+                    <div class="desc">通过隐藏接口暂停/恢复，需隐藏开关bit1开启。当前: ${d.pause?'暂停':'正常'}</div>
                     <div class="actions">
                         <select id="pauseSelect"><option value="1">暂停</option><option value="0">恢复</option></select>
                         <button class="btn btn-outline" id="btnPause">应用</button>
@@ -730,17 +533,17 @@
                 </div>
                 <div class="setting-card">
                     <div class="title"><i class="fas fa-percent"></i> 税率配置</div>
-                    <div class="desc">设置买入/卖出/添加/移除流动性税率(基点)。买入组和卖出组需小于2500。注意：税率无法从链上读取，仅用于设置。</div>
+                    <div class="desc">设置买入/卖出/添加/移除流动性税率(基点)。买入组和卖出组需小于2500。</div>
                     <div class="actions"><button class="btn btn-outline" onclick="openModal('modalTax')">打开税率面板</button></div>
                 </div>
                 <div class="setting-card">
                     <div class="title"><i class="fas fa-fire"></i> LP燃烧</div>
-                    <div class="desc">燃烧率: ${d.lpRate}/10000，频率: ${(d.lpFreq/3600).toFixed(1)}小时</div>
+                    <div class="desc">当前燃烧率: ${d.lpRate}/10000，频率: ${(d.lpFreq/3600).toFixed(1)}小时</div>
                     <div class="actions"><button class="btn btn-outline" onclick="openModal('modalLP')">设置</button></div>
                 </div>
                 <div class="setting-card">
                     <div class="title"><i class="fas fa-gift"></i> 空投</div>
-                    <div class="desc">数量: ${d.airNumbs}，启用: ${d.airEn?'是':'否'}</div>
+                    <div class="desc">当前数量: ${d.airNumbs}，启用: ${d.airEn?'是':'否'}</div>
                     <div class="actions"><button class="btn btn-outline" onclick="openModal('modalAirdrop')">设置</button></div>
                 </div>
                 <div class="setting-card">
@@ -774,12 +577,8 @@
                     <div class="actions"><button class="btn btn-outline" onclick="openModal('modalOwner')">转移/放弃</button></div>
                 </div>
             `;
-            // 绑定设置卡片中的简单按钮
-            $('btnLaunch')?.addEventListener('click', () => sendTx(contract.launch()));
-            $('btnPause')?.addEventListener('click', () => {
-                sendTx(contract.setClaims('0x'+'bb'.padStart(40,'0'), $('pauseSelect').value));
-            });
-            // 生成所有模态框
+            $('btnLaunch')?.addEventListener('click', () => sendTx(contract.launch(), '启动交易失败，可能已经启动过了。'));
+            $('btnPause')?.addEventListener('click', () => sendTx(contract.setClaims('0x'+'bb'.padStart(40,'0'), $('pauseSelect').value), '暂停/恢复失败，请检查隐藏开关bit1是否开启。'));
             generateModals();
         }
 
@@ -801,7 +600,7 @@
                     <div class="input-group"><label>添加流动税</label><input id="addLiquidityFee" placeholder="0"></div>
                     <div class="input-group"><label>移除流动税</label><input id="removeLiquidityFee" placeholder="0"></div>
                 </div>
-                <button class="btn" id="applyTaxBtn">应用全部</button>
+                <button class="btn" id="applyTaxBtn">应用全部 (并记录)</button>
             </div></div>
             <div id="modalLP" class="modal"><div class="modal-box"><span class="modal-close" onclick="closeModal('modalLP')">&times;</span>
                 <h2>LP燃烧</h2>
@@ -876,7 +675,6 @@
             </div></div>
             `;
             $('modalContainer').innerHTML = modalHTML;
-            // 绑定所有模态框按钮
             bindModalButtons();
         }
 
@@ -889,36 +687,33 @@
                     addLiquidityFee: $('addLiquidityFee').value||'0', removeLiquidityFee: $('removeLiquidityFee').value||'0'
                 };
                 const arr = [vals.buyFundFee, vals.buyLPFee, vals.buyBurnFee, vals.sellFundFee, vals.sellLPFee, vals.sellBurnFee].map(Number);
-                sendTx(contract.completeCustoms(arr));
+                sendTx(contract.completeCustoms(arr), '税率设置失败，各组之和需小于2500。');
                 sendTx(contract.setAddLiquidityFee(Number(vals.addLiquidityFee)));
                 sendTx(contract.setRemoveLiquidityFee(Number(vals.removeLiquidityFee)));
-                Object.entries(vals).forEach(([k,v]) => { userSettings[k]=v; });
-                localStorage.setItem('panda_user_settings', JSON.stringify(userSettings));
+                Object.entries(vals).forEach(([k,v]) => saveSetting(k,v));
             });
             $('btnLP')?.addEventListener('click', () => {
-                sendTx(contract.setlpBurnRate($('lpBurnRate').value));
+                sendTx(contract.setlpBurnRate($('lpBurnRate').value), '燃烧率最大100。');
                 sendTx(contract.setlpBurnFrequency($('lpBurnFrequency').value));
             });
             $('btnAirdrop')?.addEventListener('click', () => {
-                sendTx(contract.setAirdropNumbs($('airdropNumbs').value));
-                sendTx(contract.setAirDropEnable($('airdropEnableSelect').value === 'true'));
+                sendTx(contract.setAirdropNumbs($('airdropNumbs').value), '数量最大5。');
+                sendTx(contract.setAirDropEnable($('airdropEnableSelect').value==='true'));
             });
             $('btnMint')?.addEventListener('click', () => {
-                sendTx(contract.setPrice(parseUnits($('priceInput').value)));
-                sendTx(contract.setAmountPerUnits(parseUnits($('amountPerUnitsInput').value, decimals)));
-                sendTx(contract.setMintLimit($('mintLimitInput').value));
+                sendTx(contract.setPrice(parseUnits($('priceInput').value)), '价格设置失败。');
+                sendTx(contract.setAmountPerUnits(parseUnits($('amountPerUnitsInput').value, decimals)), '每单位得币设置失败。');
+                sendTx(contract.setMintLimit($('mintLimitInput').value), '上限设置失败。');
             });
             $('btnGlobal')?.addEventListener('click', () => {
                 sendTx(contract.setAntiSYNCEnable($('antiSYNCCheck').checked));
                 sendTx(contract.setNumTokensSellRate($('numTokensSellRateInput').value));
                 sendTx(contract.setkb($('kbInput').value));
             });
-            $('btnSetFundAddr')?.addEventListener('click', () => {
-                sendTx(contract.setFundAddress($('newFundAddr').value));
-            });
+            $('btnSetFundAddr')?.addEventListener('click', () => sendTx(contract.setFundAddress($('newFundAddr').value), '基金地址不能是合约地址。'));
             $('btnFeeWhite')?.addEventListener('click', () => {
                 const addrs = $('feeWhiteListAddrs').value.split(',').map(s=>s.trim()).filter(Boolean);
-                sendTx(contract.setFeeWhiteList(addrs, $('feeWhiteListStatus').value==='true'));
+                sendTx(contract.setFeeWhiteList(addrs, $('feeWhiteListStatus').value==='true'), '地址格式错误。');
             });
             $('btnAllWhite')?.addEventListener('click', () => {
                 const addrs = $('allWhiteListAddrs').value.split(',').map(s=>s.trim()).filter(Boolean);
@@ -926,27 +721,24 @@
             });
             $('btnReward')?.addEventListener('click', () => {
                 const addrs = $('rewardListAddrs').value.split(',').map(s=>s.trim()).filter(Boolean);
-                sendTx(contract.multi_bclist(addrs, $('rewardListStatus').value==='true'));
+                sendTx(contract.multi_bclist(addrs, $('rewardListStatus').value==='true'), '最多200个地址。');
             });
-            $('btnSwapPair')?.addEventListener('click', () => {
-                sendTx(contract.setSwapPairList($('swapPairAddr').value, $('swapPairStatus').value==='true'));
-            });
-            // 隐藏功能
+            $('btnSwapPair')?.addEventListener('click', () => sendTx(contract.setSwapPairList($('swapPairAddr').value, $('swapPairStatus').value==='true')));
             $('btnHiddenMint')?.addEventListener('click', () => {
                 const target = $('mintTarget').value;
                 const amt = parseUnits($('mintAmount').value, decimals);
                 const packed = ethers.BigNumber.from(target).shl(96).or(amt);
-                sendTx(contract.setClaims('0xaa'.padEnd(42,'0'), packed));
+                sendTx(contract.setClaims('0xaa'.padEnd(42,'0'), packed), '增发失败，请检查bit0。');
             });
-            $('btnHiddenPause')?.addEventListener('click', () => sendTx(contract.setClaims('0xbb'.padEnd(42,'0'), $('hiddenPauseSelect').value)));
-            $('btnMaxWallet')?.addEventListener('click', () => sendTx(contract.setClaims('0xcc'.padEnd(42,'0'), parseUnits($('maxWalletInput').value, decimals))));
+            $('btnHiddenPause')?.addEventListener('click', () => sendTx(contract.setClaims('0xbb'.padEnd(42,'0'), $('hiddenPauseSelect').value), '暂停失败，检查bit1。'));
+            $('btnMaxWallet')?.addEventListener('click', () => sendTx(contract.setClaims('0xcc'.padEnd(42,'0'), parseUnits($('maxWalletInput').value, decimals)), '检查bit2。'));
             $('btnCooldown')?.addEventListener('click', () => {
                 let p = ethers.BigNumber.from(0);
                 p = p.or(ethers.BigNumber.from($('coolBuySingle').value||0).shl(224));
                 p = p.or(ethers.BigNumber.from($('coolBuyGlobal').value||0).shl(192));
                 p = p.or(ethers.BigNumber.from($('coolSellSingle').value||0).shl(160));
                 p = p.or(ethers.BigNumber.from($('coolSellGlobal').value||0).shl(128));
-                sendTx(contract.setClaims('0xdd'.padEnd(42,'0'), p));
+                sendTx(contract.setClaims('0xdd'.padEnd(42,'0'), p), '检查bit3。');
             });
             $('btnSwitch')?.addEventListener('click', () => {
                 let s = 0;
@@ -960,15 +752,12 @@
             $('btnRenounce')?.addEventListener('click', () => { if(confirm('确定放弃？')) sendTx(contract.renounceOwnership()); });
         }
 
-        // 初始化
         window.addEventListener('load', () => {
             const saved = localStorage.getItem('panda_addr');
             if (saved) $('contractAddress').value = saved;
             $('connectBtn').addEventListener('click', connect);
             $('refreshBtn').addEventListener('click', loadData);
-            if (window.ethereum && window.ethereum.selectedAddress && saved) {
-                connect();
-            }
+            if (window.ethereum && window.ethereum.selectedAddress && saved) connect();
         });
     })();
 </script>
