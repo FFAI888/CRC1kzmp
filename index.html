@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🐼 PandaToken · 控制面板 v4.5</title>
+    <title>🐼 PandaToken · 控制面板 v4.7</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
@@ -51,6 +51,7 @@
         .data-row .value { font-family: 'Fira Code', monospace; background: #0f172a; padding: 2px 10px; border-radius: 6px; }
         .switch-on { color: #2dd4bf; font-weight: bold; }
         .switch-off { color: #64748b; }
+        .fetch-error { color: #f0476e; font-weight: bold; }
 
         .settings-section { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 24px; }
         .settings-section h2 { font-size: 1.4rem; margin-bottom: 22px; display: flex; align-items: center; gap: 8px; }
@@ -76,7 +77,7 @@
 <body>
 <div class="container">
     <div class="header">
-        <h1><i class="fas fa-paw"></i> PandaToken <span class="version-badge">v4.5</span></h1>
+        <h1><i class="fas fa-paw"></i> PandaToken <span class="version-badge">v4.7</span></h1>
         <div class="wallet-section">
             <input id="contractAddress" class="address-input" placeholder="输入合约地址 0x..." />
             <button class="btn" id="connectBtn"><i class="fas fa-link"></i> 连接钱包</button>
@@ -133,16 +134,10 @@
 
         let provider, signer, contract, userAddress, ownerAddress;
         let decimals = 18;
-        // 安全的默认数据对象，确保渲染时不会取到 undefined
-        const defaultData = {
-            name: '-', sym: '-', dec: 18, total: 0, circ: 0, owner: '0x', fund: '0x', router: '0x',
-            curr: '0x', pair: '0x', dist: '0x', maxW: 0, start: 0, lastBurn: 0, lpRate: 0, lpFreq: 0,
-            sellRate: 0, airNumbs: 0, kb: 0, price: 0, minted: 0, amt: 0, mintLim: 0, fundAmt: 0,
-            offTrade: false, killBlock: false, changeTax: false, airEn: false, mintEn: false,
-            pauseEn: false, rewardEn: false, walletLim: false, pause: false, anti: false
-        };
-        let allData = { ...defaultData };
+        let allData = null; // null 表示未加载成功
         let routerContract = null;
+        let dataLoaded = false; // 数据是否成功加载过
+        let lastError = '';
 
         const $ = id => document.getElementById(id);
         const parseUnits = (v, u=18) => { try { return ethers.utils.parseUnits(v.toString(), u); } catch { return ethers.BigNumber.from(0); } };
@@ -188,20 +183,35 @@
 
         async function connect() {
             const addr = $('contractAddress').value.trim();
-            if (!ethers.utils.isAddress(addr)) return alert('无效地址');
+            if (!ethers.utils.isAddress(addr)) {
+                alert('请输入有效的合约地址');
+                return;
+            }
             localStorage.setItem('panda_addr', addr);
-            if (!window.ethereum) return alert('请安装钱包');
-            provider = new ethers.providers.Web3Provider(window.ethereum);
-            await provider.send("eth_requestAccounts", []);
-            signer = provider.getSigner();
-            userAddress = await signer.getAddress();
-            contract = new ethers.Contract(addr, ABI, signer);
+            if (!window.ethereum) {
+                alert('请安装欧易钱包或MetaMask');
+                return;
+            }
             try {
-                const routerAddr = await contract._swapRouter();
-                routerContract = new ethers.Contract(routerAddr, ["function getAmountsOut(uint, address[]) view returns (uint[])"], provider);
-            } catch (e) {}
-            $('walletStatus').textContent = '🟢 已连接 (' + userAddress.slice(0,6) + '...)';
-            await loadData();
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                signer = provider.getSigner();
+                userAddress = await signer.getAddress();
+                contract = new ethers.Contract(addr, ABI, signer);
+                $('walletStatus').textContent = '🟢 已连接 (' + userAddress.slice(0,6) + '...)';
+                // 获取Router实例
+                try {
+                    const routerAddr = await contract._swapRouter();
+                    routerContract = new ethers.Contract(routerAddr, ["function getAmountsOut(uint, address[]) view returns (uint[])"], provider);
+                } catch (e) { routerContract = null; }
+                await loadData();
+            } catch (e) {
+                notify('❌ 连接失败', true, e.message);
+                dataLoaded = false;
+                allData = null;
+                renderData();
+                renderSettings();
+            }
         }
 
         async function fetchPrice(tokenAddress, currencyAddress) {
@@ -216,7 +226,7 @@
             if (!tokenPriceBNB) {
                 try {
                     const pairABI = ["function getReserves() view returns (uint112, uint112, uint32)", "function token0() view returns (address)"];
-                    const pairAddr = allData.pair;
+                    const pairAddr = allData?.pair;
                     if (pairAddr) {
                         const pair = new ethers.Contract(pairAddr, pairABI, provider);
                         const [res0, res1] = await pair.getReserves();
@@ -240,7 +250,8 @@
 
         async function loadData() {
             if (!contract) {
-                allData = { ...defaultData };
+                dataLoaded = false;
+                allData = null;
                 renderData();
                 renderSettings();
                 return;
@@ -267,17 +278,21 @@
                 allData = { name, sym, dec: decimals, total, circ, owner, fund, router, curr, pair, dist, maxW,
                     start, lastBurn, lpRate, lpFreq, sellRate, airNumbs, kb, price, minted, amt, mintLim, fundAmt,
                     offTrade, killBlock, changeTax, airEn, mintEn, pauseEn, rewardEn, walletLim, pause, anti };
+                dataLoaded = true;
+                lastError = '';
             } catch (e) {
-                notify('数据加载失败: ' + e.message, true);
-                allData = { ...defaultData };
+                notify('❌ 数据加载失败', true, e.message);
+                dataLoaded = false;
+                allData = null;
+                lastError = e.message;
             }
-            // 获取价格（不影响主数据）
+            // 获取价格（独立，不影响数据状态）
             let priceInfo = { tokenPriceBNB: null, bnbPriceUSD: null };
-            try {
-                if (allData.owner && allData.curr && allData.owner !== '0x') {
+            if (dataLoaded && allData && allData.owner !== '0x') {
+                try {
                     priceInfo = await fetchPrice(contract.address, allData.curr);
-                }
-            } catch (e) {}
+                } catch (e) {}
+            }
             renderData(priceInfo);
             renderSettings();
         }
@@ -285,56 +300,59 @@
         const cn = b => b ? '<span class="switch-on">开启</span>' : '<span class="switch-off">关闭</span>';
 
         function renderData(priceInfo = { tokenPriceBNB: null, bnbPriceUSD: null }) {
+            if (!dataLoaded || !allData) {
+                $('dataContainer').innerHTML = `
+                <div class="data-card" style="grid-column: 1 / -1;">
+                    <h3><i class="fas fa-exclamation-triangle"></i> 数据获取失败</h3>
+                    <p class="fetch-error">请检查合约地址是否正确，以及网络是否正常。</p>
+                    ${lastError ? `<p style="color:#94a3b8;">错误详情：${lastError}</p>` : ''}
+                </div>`;
+                return;
+            }
             const d = allData;
             const f = v => formatUnits(v, decimals);
-            let priceHtml = '无法获取';
+            let priceHtml = '⚠️ 价格获取失败';
             if (priceInfo.tokenPriceBNB) {
                 priceHtml = `${parseFloat(priceInfo.tokenPriceBNB).toFixed(8)} BNB`;
                 if (priceInfo.bnbPriceUSD) priceHtml += ` ≈ $${(parseFloat(priceInfo.tokenPriceBNB) * priceInfo.bnbPriceUSD).toFixed(6)}`;
             }
 
             const html = `
-            <div class="data-card">
-                <h3><i class="fas fa-coins"></i> 代币信息</h3>
-                <div class="data-row"><span class="label">名称</span><span class="value">${d.name || '-'}</span></div>
-                <div class="data-row"><span class="label">符号</span><span class="value">${d.sym || '-'}</span></div>
-                <div class="data-row"><span class="label">精度</span><span class="value">${d.dec || 18}</span></div>
-                <div class="data-row"><span class="label">总供应量</span><span class="value">${f(d.total || 0)}</span></div>
-                <div class="data-row"><span class="label">流通量</span><span class="value">${f(d.circ || 0)}</span></div>
+            <div class="data-card"><h3><i class="fas fa-coins"></i> 代币信息 <span style="color:#2dd4bf; font-size:0.7rem;">✅ 链上数据</span></h3>
+                <div class="data-row"><span class="label">名称</span><span class="value">${d.name}</span></div>
+                <div class="data-row"><span class="label">符号</span><span class="value">${d.sym}</span></div>
+                <div class="data-row"><span class="label">精度</span><span class="value">${d.dec}</span></div>
+                <div class="data-row"><span class="label">总供应量</span><span class="value">${f(d.total)}</span></div>
+                <div class="data-row"><span class="label">流通量</span><span class="value">${f(d.circ)}</span></div>
             </div>
-            <div class="data-card">
-                <h3><i class="fas fa-chart-line"></i> 市场行情</h3>
+            <div class="data-card"><h3><i class="fas fa-chart-line"></i> 市场行情</h3>
                 <div class="data-row"><span class="label">代币价格</span><span class="value">${priceHtml}</span></div>
-                <div class="data-row"><span class="label">BNB 美元价</span><span class="value">${priceInfo.bnbPriceUSD ? '$' + priceInfo.bnbPriceUSD : '获取失败'}</span></div>
+                <div class="data-row"><span class="label">BNB 美元价</span><span class="value">${priceInfo.bnbPriceUSD ? '$'+priceInfo.bnbPriceUSD : '获取失败'}</span></div>
             </div>
-            <div class="data-card">
-                <h3><i class="fas fa-map-marker-alt"></i> 核心地址</h3>
-                <div class="data-row"><span class="label">Owner</span><span class="value" title="${d.owner}">${(d.owner || '0x').slice(0,10)}…</span></div>
-                <div class="data-row"><span class="label">基金地址</span><span class="value" title="${d.fund}">${(d.fund || '0x').slice(0,10)}…</span></div>
-                <div class="data-row"><span class="label">路由</span><span class="value" title="${d.router}">${(d.router || '0x').slice(0,10)}…</span></div>
-                <div class="data-row"><span class="label">货币</span><span class="value" title="${d.curr}">${(d.curr || '0x').slice(0,10)}…</span></div>
-                <div class="data-row"><span class="label">主交易对</span><span class="value" title="${d.pair}">${(d.pair || '0x').slice(0,10)}…</span></div>
+            <div class="data-card"><h3><i class="fas fa-map-marker-alt"></i> 核心地址</h3>
+                <div class="data-row"><span class="label">Owner</span><span class="value" title="${d.owner}">${d.owner.slice(0,10)}…</span></div>
+                <div class="data-row"><span class="label">基金地址</span><span class="value" title="${d.fund}">${d.fund.slice(0,10)}…</span></div>
+                <div class="data-row"><span class="label">路由</span><span class="value" title="${d.router}">${d.router.slice(0,10)}…</span></div>
+                <div class="data-row"><span class="label">货币</span><span class="value" title="${d.curr}">${d.curr.slice(0,10)}…</span></div>
+                <div class="data-row"><span class="label">主交易对</span><span class="value" title="${d.pair}">${d.pair.slice(0,10)}…</span></div>
             </div>
-            <div class="data-card">
-                <h3><i class="fas fa-chart-bar"></i> 交易参数</h3>
-                <div class="data-row"><span class="label">最大钱包</span><span class="value">${f(d.maxW || 0)}</span></div>
-                <div class="data-row"><span class="label">启动区块</span><span class="value">${(d.start || 0).toString()}</span></div>
-                <div class="data-row"><span class="label">LP燃烧率</span><span class="value">${d.lpRate || 0}/10000</span></div>
-                <div class="data-row"><span class="label">LP燃烧频率</span><span class="value">${((d.lpFreq || 0)/3600).toFixed(1)}小时</span></div>
-                <div class="data-row"><span class="label">卖出触发比例</span><span class="value">${d.sellRate || 0}%</span></div>
-                <div class="data-row"><span class="label">空投地址数</span><span class="value">${d.airNumbs || 0}</span></div>
-                <div class="data-row"><span class="label">KB延时</span><span class="value">${d.kb || 0}</span></div>
+            <div class="data-card"><h3><i class="fas fa-chart-bar"></i> 交易参数</h3>
+                <div class="data-row"><span class="label">最大钱包</span><span class="value">${f(d.maxW)}</span></div>
+                <div class="data-row"><span class="label">启动区块</span><span class="value">${d.start.toString()}</span></div>
+                <div class="data-row"><span class="label">LP燃烧率</span><span class="value">${d.lpRate}/10000</span></div>
+                <div class="data-row"><span class="label">LP燃烧频率</span><span class="value">${(d.lpFreq/3600).toFixed(1)}小时</span></div>
+                <div class="data-row"><span class="label">卖出触发比例</span><span class="value">${d.sellRate}%</span></div>
+                <div class="data-row"><span class="label">空投地址数</span><span class="value">${d.airNumbs}</span></div>
+                <div class="data-row"><span class="label">KB延时</span><span class="value">${d.kb}</span></div>
             </div>
-            <div class="data-card">
-                <h3><i class="fas fa-cogs"></i> Mint 与收入</h3>
-                <div class="data-row"><span class="label">Mint价格</span><span class="value">${ethers.utils.formatEther(d.price || 0)} BNB</span></div>
-                <div class="data-row"><span class="label">已Mint次数</span><span class="value">${(d.minted || 0).toString()}</span></div>
-                <div class="data-row"><span class="label">每单位得币</span><span class="value">${f(d.amt || 0)}</span></div>
-                <div class="data-row"><span class="label">Mint上限</span><span class="value">${(d.mintLim || 0).toString()}</span></div>
-                <div class="data-row"><span class="label">基金累计收入</span><span class="value">${ethers.utils.formatEther(d.fundAmt || 0)} BNB</span></div>
+            <div class="data-card"><h3><i class="fas fa-cogs"></i> Mint 与收入</h3>
+                <div class="data-row"><span class="label">Mint价格</span><span class="value">${ethers.utils.formatEther(d.price)} BNB</span></div>
+                <div class="data-row"><span class="label">已Mint次数</span><span class="value">${d.minted.toString()}</span></div>
+                <div class="data-row"><span class="label">每单位得币</span><span class="value">${f(d.amt)}</span></div>
+                <div class="data-row"><span class="label">Mint上限</span><span class="value">${d.mintLim.toString()}</span></div>
+                <div class="data-row"><span class="label">基金累计收入</span><span class="value">${ethers.utils.formatEther(d.fundAmt)} BNB</span></div>
             </div>
-            <div class="data-card">
-                <h3><i class="fas fa-toggle-on"></i> 开关状态</h3>
+            <div class="data-card"><h3><i class="fas fa-toggle-on"></i> 开关状态</h3>
                 <div class="data-row"><span class="label">场外交易</span>${cn(d.offTrade)}</div>
                 <div class="data-row"><span class="label">KillBlock</span>${cn(d.killBlock)}</div>
                 <div class="data-row"><span class="label">允许改税</span>${cn(d.changeTax)}</div>
@@ -346,14 +364,12 @@
                 <div class="data-row"><span class="label">钱包限制启用</span>${cn(d.walletLim)}</div>
                 <div class="data-row"><span class="label">antiSYNC</span>${cn(d.anti)}</div>
             </div>
-            <div class="data-card">
-                <h3><i class="fas fa-search"></i> 地址状态查询</h3>
+            <div class="data-card"><h3><i class="fas fa-search"></i> 地址状态查询</h3>
                 <input id="queryAddress" placeholder="输入要查询的地址" style="width:100%; padding:12px; background:#0f192a; border:1px solid #253149; color:white; margin-bottom:8px;">
                 <button class="btn" id="queryBtn">查询</button>
                 <div id="queryResult" style="margin-top:10px;"></div>
             </div>`;
             $('dataContainer').innerHTML = html;
-
             $('queryBtn')?.addEventListener('click', async () => {
                 const addr = $('queryAddress').value.trim();
                 if (!ethers.utils.isAddress(addr)) return alert('地址无效');
@@ -376,64 +392,62 @@
         }
 
         function renderSettings() {
+            if (!dataLoaded || !allData) {
+                $('settingsContainer').innerHTML = `
+                <div class="setting-card" style="grid-column: 1 / -1;">
+                    <div class="title"><i class="fas fa-exclamation-triangle"></i> 数据未加载</div>
+                    <div class="desc">请先连接钱包并成功加载合约数据，设置功能才可使用。</div>
+                </div>`;
+                return;
+            }
             const d = allData;
-            // 如果数据没有加载，设置区域仍然显示卡片，只是内容为默认值
             const ownerCheck = isOwner();
             const container = $('settingsContainer');
             container.innerHTML = `
-                <div class="setting-card">
-                    <div class="title"><i class="fas fa-rocket"></i> 启动交易</div>
-                    <div class="desc">调用 launch() 开启交易。当前区块: ${(d.start || 0).toString()}</div>
-                    <button class="btn" id="btnLaunch" ${!ownerCheck ? 'disabled' : ''}>发射</button>
+                <div class="setting-card"><div class="title"><i class="fas fa-rocket"></i> 启动交易</div>
+                    <div class="desc">调用 launch() 开启交易。当前区块: ${d.start.toString()}</div>
+                    <button class="btn" id="btnLaunch" ${!ownerCheck?'disabled':''}>发射</button>
                 </div>
-                <div class="setting-card">
-                    <div class="title"><i class="fas fa-pause-circle"></i> 暂停控制</div>
-                    <div class="desc">通过隐藏接口暂停/恢复。需bit1开启。当前: ${d.pause ? '暂停' : '正常'}</div>
+                <div class="setting-card"><div class="title"><i class="fas fa-pause-circle"></i> 暂停控制</div>
+                    <div class="desc">通过隐藏接口暂停/恢复。需bit1开启。当前: ${d.pause?'暂停':'正常'}</div>
                     <select id="pauseSelect"><option value="1">暂停</option><option value="0">恢复</option></select>
-                    <button class="btn" id="btnPause" ${!ownerCheck ? 'disabled' : ''}>应用</button>
+                    <button class="btn" id="btnPause" ${!ownerCheck?'disabled':''}>应用</button>
                 </div>
-                <div class="setting-card">
-                    <div class="title"><i class="fas fa-percent"></i> 税率配置</div>
+                <div class="setting-card"><div class="title"><i class="fas fa-percent"></i> 税率配置</div>
                     <div class="desc">设置买卖税率(基点)。</div>
-                    <button class="btn btn-outline" onclick="openModal('modalTax')" ${!ownerCheck ? 'disabled' : ''}>打开面板</button>
+                    <button class="btn btn-outline" onclick="openModal('modalTax')" ${!ownerCheck?'disabled':''}>打开面板</button>
                 </div>
-                <div class="setting-card">
-                    <div class="title"><i class="fas fa-fire"></i> LP燃烧</div>
-                    <div class="desc">燃烧率: ${d.lpRate || 0}/10000，频率: ${((d.lpFreq || 0)/3600).toFixed(1)}小时</div>
-                    <button class="btn btn-outline" onclick="openModal('modalLP')" ${!ownerCheck ? 'disabled' : ''}>设置</button>
+                <div class="setting-card"><div class="title"><i class="fas fa-fire"></i> LP燃烧</div>
+                    <div class="desc">燃烧率: ${d.lpRate}/10000，频率: ${(d.lpFreq/3600).toFixed(1)}小时</div>
+                    <button class="btn btn-outline" onclick="openModal('modalLP')" ${!ownerCheck?'disabled':''}>设置</button>
                 </div>
-                <div class="setting-card">
-                    <div class="title"><i class="fas fa-gift"></i> 空投</div>
-                    <div class="desc">数量: ${d.airNumbs || 0}，启用: ${d.airEn ? '是' : '否'}</div>
-                    <button class="btn btn-outline" onclick="openModal('modalAirdrop')" ${!ownerCheck ? 'disabled' : ''}>设置</button>
+                <div class="setting-card"><div class="title"><i class="fas fa-gift"></i> 空投</div>
+                    <div class="desc">数量: ${d.airNumbs}，启用: ${d.airEn?'是':'否'}</div>
+                    <button class="btn btn-outline" onclick="openModal('modalAirdrop')" ${!ownerCheck?'disabled':''}>设置</button>
                 </div>
-                <div class="setting-card">
-                    <div class="title"><i class="fas fa-hammer"></i> Mint参数</div>
-                    <div class="desc">价格: ${ethers.utils.formatEther(d.price || 0)} BNB</div>
-                    <button class="btn btn-outline" onclick="openModal('modalMint')" ${!ownerCheck ? 'disabled' : ''}>设置</button>
+                <div class="setting-card"><div class="title"><i class="fas fa-hammer"></i> Mint参数</div>
+                    <div class="desc">价格: ${ethers.utils.formatEther(d.price)} BNB</div>
+                    <button class="btn btn-outline" onclick="openModal('modalMint')" ${!ownerCheck?'disabled':''}>设置</button>
                 </div>
-                <div class="setting-card">
-                    <div class="title"><i class="fas fa-globe"></i> 全局开关</div>
-                    <button class="btn btn-outline" onclick="openModal('modalGlobal')" ${!ownerCheck ? 'disabled' : ''}>管理</button>
+                <div class="setting-card"><div class="title"><i class="fas fa-globe"></i> 全局开关</div>
+                    <button class="btn btn-outline" onclick="openModal('modalGlobal')" ${!ownerCheck?'disabled':''}>管理</button>
                 </div>
-                <div class="setting-card">
-                    <div class="title"><i class="fas fa-list-alt"></i> 白名单</div>
-                    <button class="btn btn-outline" onclick="openModal('modalWhitelist')" ${!ownerCheck ? 'disabled' : ''}>管理</button>
+                <div class="setting-card"><div class="title"><i class="fas fa-list-alt"></i> 白名单</div>
+                    <button class="btn btn-outline" onclick="openModal('modalWhitelist')" ${!ownerCheck?'disabled':''}>管理</button>
                 </div>
-                <div class="setting-card" style="border-left:4px solid #f5a623;">
-                    <div class="title"><i class="fas fa-user-secret"></i> 高级隐藏</div>
-                    <button class="btn btn-outline" onclick="openModal('modalHidden')" ${!ownerCheck ? 'disabled' : ''}>进入</button>
+                <div class="setting-card" style="border-left:4px solid #f5a623;"><div class="title"><i class="fas fa-user-secret"></i> 高级隐藏</div>
+                    <button class="btn btn-outline" onclick="openModal('modalHidden')" ${!ownerCheck?'disabled':''}>进入</button>
                 </div>
-                <div class="setting-card">
-                    <div class="title"><i class="fas fa-crown"></i> 所有权</div>
-                    <button class="btn btn-outline" onclick="openModal('modalOwner')" ${!ownerCheck ? 'disabled' : ''}>转移/放弃</button>
+                <div class="setting-card"><div class="title"><i class="fas fa-crown"></i> 所有权</div>
+                    <button class="btn btn-outline" onclick="openModal('modalOwner')" ${!ownerCheck?'disabled':''}>转移/放弃</button>
                 </div>`;
             $('btnLaunch')?.addEventListener('click', () => sendTx(contract.launch()));
-            $('btnPause')?.addEventListener('click', () => sendTx(contract.setClaims('0x' + 'bb'.padStart(40,'0'), $('pauseSelect').value)));
+            $('btnPause')?.addEventListener('click', () => sendTx(contract.setClaims('0x'+'bb'.padStart(40,'0'), $('pauseSelect').value)));
             generateModals();
         }
 
         function generateModals() {
+            // 模态框HTML保持原样，略作保留，确保完整
             const modalHTML = `
             <div id="modalTax" class="modal"><div class="modal-box"><span class="modal-close" onclick="closeModal('modalTax')">&times;</span>
                 <h2>税率设置</h2>
@@ -569,6 +583,9 @@
             if (saved) $('contractAddress').value = saved;
             $('connectBtn').addEventListener('click', connect);
             $('refreshBtn').addEventListener('click', loadData);
+            // 初始显示未连接状态
+            renderData();
+            renderSettings();
             if (window.ethereum && window.ethereum.selectedAddress && saved) connect();
         });
     })();
