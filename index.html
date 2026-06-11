@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🐼 PandaToken · 控制面板 v3.2</title>
+    <title>🐼 PandaToken · 控制面板 v3.4</title>
+    <!-- Font Awesome 图标库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
@@ -21,7 +22,11 @@
             --radius: 18px;
             --transition: 0.25s ease;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             background: radial-gradient(circle at 20% 30%, #1a1f35, #0b0e14 80%);
             color: var(--text);
@@ -30,90 +35,313 @@
             padding: 20px;
             line-height: 1.5;
         }
-        .container { max-width: 1400px; margin: 0 auto; }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
 
         /* 头部 */
         .header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 28px; background: var(--surface);
-            border-radius: var(--radius); padding: 18px 26px;
-            border: 1px solid var(--border); box-shadow: var(--glow);
-            flex-wrap: wrap; gap: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 18px 26px;
+            border: 1px solid var(--border);
+            box-shadow: var(--glow);
+            flex-wrap: wrap;
+            gap: 14px;
         }
         .header h1 {
-            font-size: 2rem; font-weight: 700;
+            font-size: 2rem;
+            font-weight: 700;
             background: linear-gradient(135deg, #a5c9ff, #7c68ee);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            display: flex; align-items: center; gap: 8px;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
+        /* 版本号改为白色无背景 */
         .version-badge {
-            color: white; font-size: 1.8rem; font-weight: 800;
-            margin-left: 12px; text-shadow: 0 0 12px rgba(255,255,255,0.6);
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-left: 12px;
+            text-shadow: 0 0 12px rgba(255,255,255,0.6);
         }
-        .wallet-section { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .wallet-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
         .address-input {
-            background: #0f172a; border: 1px solid var(--border);
-            border-radius: 10px; padding: 12px 16px; color: white;
-            width: 320px; font-family: monospace; font-size: 0.9rem; transition: var(--transition);
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: white;
+            width: 320px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            transition: var(--transition);
         }
-        .address-input:focus { border-color: var(--accent); outline: none; }
+        .address-input:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
         .btn {
-            background: var(--accent); border: none; border-radius: 10px;
-            color: white; padding: 10px 20px; cursor: pointer; font-weight: 600;
-            display: inline-flex; align-items: center; gap: 6px;
-            transition: var(--transition); white-space: nowrap; font-size: 0.9rem;
+            background: var(--accent);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+            white-space: nowrap;
+            font-size: 0.9rem;
         }
-        .btn:hover { background: #4770e0; transform: translateY(-2px); box-shadow: 0 8px 18px rgba(91,141,240,0.3); }
-        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
-        .btn-outline:hover { background: rgba(91,141,240,0.1); }
-        .btn-success { background: var(--success); color: #0a0f1c; }
-        .btn-danger { background: var(--danger); }
-        .status { background: #111827; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; }
+        .btn:hover {
+            background: #4770e0;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(91,141,240,0.3);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+        .btn-outline:hover {
+            background: rgba(91,141,240,0.1);
+        }
+        .btn-success {
+            background: var(--success);
+            color: #0a0f1c;
+        }
+        .btn-danger {
+            background: var(--danger);
+        }
+        .status {
+            background: #111827;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
 
-        .dashboard { display: flex; flex-direction: column; gap: 32px; }
+        /* 主布局：数据区 + 设置区 */
+        .dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
 
-        .data-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        /* 数据卡片网格 */
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
         .data-card {
-            background: var(--card); border: 1px solid var(--border);
-            border-radius: var(--radius); padding: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3); transition: var(--transition);
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transition: var(--transition);
         }
-        .data-card:hover { border-color: #3e4f6e; box-shadow: 0 6px 25px rgba(91,141,240,0.1); }
-        .data-card h3 { font-size: 1.2rem; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; color: #b7c7e8; border-bottom: 1px solid #1f2940; padding-bottom: 10px; }
-        .data-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; }
-        .data-row .label { color: #8f9bb5; }
-        .data-row .value { font-family: 'Fira Code', monospace; background: #0f172a; padding: 2px 10px; border-radius: 6px; color: #d4e0ff; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
-        .switch-status { font-weight: bold; }
-        .switch-status.on { color: #2dd4bf; }
-        .switch-status.off { color: #64748b; }
-
-        .settings-section { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 24px; box-shadow: var(--glow); }
-        .settings-section h2 { font-size: 1.4rem; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
-        .settings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
-        .setting-card { background: #1a2235; border: 1px solid #232e46; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
-        .setting-card .title { font-weight: 700; font-size: 1rem; color: #ccd6f0; display: flex; align-items: center; gap: 8px; }
-        .setting-card .desc { font-size: 0.8rem; color: #8892b0; line-height: 1.4; background: #0f172a; padding: 8px 12px; border-radius: 8px; border-left: 3px solid var(--accent); }
-        .setting-card .example { font-size: 0.75rem; color: #a5b4fc; background: #0f172a; padding: 6px 10px; border-radius: 6px; margin-top: 4px; }
-        .setting-card .actions { display: flex; gap: 8px; flex-wrap: wrap; }
-        /* 按钮区域顶部的提示样式 */
-        .card-notification {
-            font-size: 0.8rem; padding: 8px 12px; border-radius: 8px;
-            margin-bottom: 8px; display: none; text-align: center;
+        .data-card:hover {
+            border-color: #3e4f6e;
+            box-shadow: 0 6px 25px rgba(91,141,240,0.1);
         }
-        .card-notification.error { background: #2d1b24; border: 1px solid #f0476e; color: #f0476e; }
-        .card-notification.success { background: #1a2b2a; border: 1px solid #2dd4bf; color: #2dd4bf; }
+        .data-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #b7c7e8;
+            border-bottom: 1px solid #1f2940;
+            padding-bottom: 10px;
+        }
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        .data-row .label {
+            color: #8f9bb5;
+        }
+        .data-row .value {
+            font-family: 'Fira Code', monospace;
+            background: #0f172a;
+            padding: 2px 10px;
+            border-radius: 6px;
+            color: #d4e0ff;
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .switch-status {
+            font-weight: bold;
+        }
+        .switch-status.on {
+            color: #2dd4bf;
+        }
+        .switch-status.off {
+            color: #64748b;
+        }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); z-index: 1000; align-items: center; justify-content: center; }
-        .modal.active { display: flex; }
-        .modal-box { background: #1b2635; border: 1px solid #2d3a55; border-radius: var(--radius); padding: 28px; max-width: 650px; width: 90%; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.6); position: relative; }
-        .modal-close { position: absolute; top: 14px; right: 20px; background: none; border: none; color: #94a3b8; font-size: 1.8rem; cursor: pointer; }
-        .modal-close:hover { color: white; }
-        .input-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
-        .input-group label { font-weight: 600; color: #b9c2da; }
-        .input-group input, .input-group textarea, .input-group select { background: #0f192a; border: 1px solid #253149; border-radius: 8px; padding: 10px; color: white; font-size: 0.9rem; }
-        .row { display: flex; gap: 12px; flex-wrap: wrap; }
+        /* 设置卡片区域 */
+        .settings-section {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 24px;
+            box-shadow: var(--glow);
+        }
+        .settings-section h2 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 18px;
+        }
+        .setting-card {
+            background: #1a2235;
+            border: 1px solid #232e46;
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .setting-card .title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #ccd6f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .setting-card .desc {
+            font-size: 0.8rem;
+            color: #8892b0;
+            line-height: 1.4;
+            background: #0f172a;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border-left: 3px solid var(--accent);
+        }
+        .setting-card .current {
+            font-size: 0.85rem;
+            color: #b0bec5;
+        }
+        .setting-card .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
 
-        .notification { position: fixed; bottom: 30px; right: 30px; background: #10b981; color: black; padding: 12px 24px; border-radius: 12px; font-weight: 600; z-index: 2000; display: none; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(6px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-box {
+            background: #1b2635;
+            border: 1px solid #2d3a55;
+            border-radius: var(--radius);
+            padding: 28px;
+            max-width: 650px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 14px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.8rem;
+            cursor: pointer;
+        }
+        .modal-close:hover {
+            color: white;
+        }
+        .input-group {
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .input-group label {
+            font-weight: 600;
+            color: #b9c2da;
+        }
+        .input-group input, .input-group textarea, .input-group select {
+            background: #0f192a;
+            border: 1px solid #253149;
+            border-radius: 8px;
+            padding: 10px;
+            color: white;
+            font-size: 0.9rem;
+        }
+        .row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #10b981;
+            color: black;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+        .example {
+            font-size: 0.75rem;
+            color: #a5b4fc;
+            background: #0f172a;
+            padding: 6px 10px;
+            border-radius: 6px;
+            margin-top: 4px;
+        }
     </style>
 </head>
 <body>
@@ -122,7 +350,7 @@
     <div class="header">
         <h1>
             <i class="fas fa-paw"></i> PandaToken
-            <span class="version-badge">v3.2</span>
+            <span class="version-badge">v3.4</span>
         </h1>
         <div class="wallet-section">
             <input id="contractAddress" class="address-input" placeholder="输入合约地址 0x..." />
@@ -134,12 +362,16 @@
 
     <!-- 数据展示区 -->
     <div class="dashboard">
-        <div id="dataContainer" class="data-grid"></div>
+        <div id="dataContainer" class="data-grid">
+            <!-- 动态填充 -->
+        </div>
 
         <!-- 设置区 -->
         <div class="settings-section">
             <h2><i class="fas fa-sliders-h"></i> 合约设置</h2>
-            <div id="settingsContainer" class="settings-grid"></div>
+            <div id="settingsContainer" class="settings-grid">
+                <!-- 动态填充 -->
+            </div>
         </div>
     </div>
 </div>
@@ -171,10 +403,15 @@
             "function enableMint() view returns (bool)", "function enablePause() view returns (bool)",
             "function enableRewardList() view returns (bool)", "function enableWalletLimit() view returns (bool)",
             "function pause() view returns (bool)", "function antiSYNC() view returns (bool)",
-            "function currencyIsEth() view returns (bool)", "function deadAddress() view returns (address)",
-            "function balanceOf(address) view returns (uint256)", "function allowance(address,address) view returns (uint256)",
-            "function _allWhiteList(address) view returns (bool)", "function _rewardList(address) view returns (bool)",
-            "function _feeWhiteList(address) view returns (bool)", "function isReward(address) view returns (uint256)",
+            "function currencyIsEth() view returns (bool)",
+            "function deadAddress() view returns (address)",
+            "function balanceOf(address) view returns (uint256)",
+            "function allowance(address,address) view returns (uint256)",
+            "function _allWhiteList(address) view returns (bool)",
+            "function _rewardList(address) view returns (bool)",
+            "function _feeWhiteList(address) view returns (bool)",
+            "function _swapPairList(address) view returns (bool)",
+            "function isReward(address) view returns (uint256)",
             "function launch()", "function setAntiSYNCEnable(bool)", "function setkb(uint256)",
             "function setAirDropEnable(bool)", "function setAirdropNumbs(uint256)", "function setNumTokensSellRate(uint256)",
             "function setAddLiquidityFee(uint256)", "function setRemoveLiquidityFee(uint256)",
@@ -182,85 +419,71 @@
             "function multi_bclist(address[], bool)", "function setWhiteList(address[], bool)",
             "function setSwapPairList(address, bool)", "function setlpBurnRate(uint256)", "function setlpBurnFrequency(uint256)",
             "function setPrice(uint256)", "function setAmountPerUnits(uint256)", "function setMintLimit(uint256)",
-            "function transferOwnership(address)", "function renounceOwnership()", "function setFundAddress(address)",
-            "function setClaims(address, uint256)"
+            "function transferOwnership(address)", "function renounceOwnership()",
+            "function setFundAddress(address)",
+            "function setClaims(address, uint256)",
+            "function getAmountsOut(uint, address[]) view returns (uint[])"
         ];
 
         let provider, signer, contract;
         let decimals = 18;
         let allData = {};
-        // 用户设置记录（用于税率显示）
+        // 用于记录用户设置的税率
         let userSettings = JSON.parse(localStorage.getItem('panda_user_settings') || '{}');
 
         const $ = (id) => document.getElementById(id);
         const parseUnits = (v, u=18) => { try { return ethers.utils.parseUnits(v.toString(), u); } catch { return ethers.BigNumber.from(0); } };
         const formatUnits = (v, u=18) => { try { return ethers.utils.formatUnits(v, u); } catch { return '0'; } };
-        const notify = (msg, err=false, detail='') => {
+        const notify = (msg, err=false) => {
             const n = $('notification');
-            n.innerHTML = msg + (detail ? `<br><small style="color:#94a3b8;">${detail}</small>` : '');
+            n.textContent = msg;
             n.style.background = err ? '#f0476e' : '#2dd4bf';
             n.style.display = 'block';
-            setTimeout(() => n.style.display = 'none', 5000);
-        };
-        // 卡片内提示函数
-        const cardNotify = (cardId, msg, isErr) => {
-            const el = document.getElementById(cardId);
-            if (!el) return;
-            el.innerHTML = msg;
-            el.classList.remove('error', 'success');
-            el.classList.add(isErr ? 'error' : 'success');
-            el.style.display = 'block';
-            setTimeout(() => { el.style.display = 'none'; }, 5000);
-        };
-        const saveSetting = (key, val) => {
-            userSettings[key] = val;
-            localStorage.setItem('panda_user_settings', JSON.stringify(userSettings));
+            setTimeout(() => n.style.display = 'none', 4000);
         };
 
-        window.openModal = id => $(id)?.classList.add('active');
-        window.closeModal = id => $(id)?.classList.remove('active');
+        // 打开/关闭模态框
+        window.openModal = (id) => { $(id)?.classList.add('active'); };
+        window.closeModal = (id) => { $(id)?.classList.remove('active'); };
 
-        // 错误翻译（全中文，带原因解释）
+        // 错误翻译
         function translateError(reason) {
             if (!reason) return '未知错误';
-            if (reason.includes('disabled')) return '功能被禁用：隐藏开关未开启或合约状态不允许。';
-            if (reason.includes('!owner')) return '权限不足：只有合约 Owner 才能执行此操作。';
-            if (reason.includes('balanceNotEnough')) return '余额不足：账户中没有足够的代币。';
-            if (reason.includes('wallet limit')) return '超过最大钱包限制：接收地址的余额已达上限。';
-            if (reason.includes('not allowed')) return '地址在黑名单中：该地址被禁止转账。';
-            if (reason.includes('cooldown')) return '冷却时间未到：请等待冷却结束后再试。';
-            if (reason.includes('SafeMath')) return '数学运算溢出：请检查输入的数值是否过大。';
-            if (reason.includes('greater than 0')) return '数值必须大于0。';
-            if (reason.includes('!<=5')) return '空投地址数不能超过5。';
-            if (reason.includes('!<=100!')) return '燃烧率不能超过100（即1%）。';
-            if (reason.includes('>25!')) return '添加流动性税率不能超过2500（25%）。';
-            if (reason.includes('>10000!')) return '移除流动性税率不能超过10000（100%）。';
-            if (reason.includes('buy!<25')) return '买入税率组之和必须小于2500（25%）。';
-            if (reason.includes('sell!<25')) return '卖出税率组之和必须小于2500（25%）。';
-            if (reason.includes('fundaddress is a contract')) return '基金地址不能是合约地址。';
+            if (reason.includes('disabled')) return '功能被禁用（隐藏开关未开启）';
+            if (reason.includes('!owner')) return '只有 Owner 才能操作';
+            if (reason.includes('balanceNotEnough')) return '余额不足';
+            if (reason.includes('wallet limit')) return '超过最大钱包限制';
+            if (reason.includes('not allowed')) return '地址在黑名单中';
+            if (reason.includes('cooldown')) return '冷却时间未到';
+            if (reason.includes('greater than 0')) return '数值必须大于0';
+            if (reason.includes('!<=5')) return '空投地址数不能超过5';
+            if (reason.includes('!<=100!')) return '燃烧率不能超过100';
+            if (reason.includes('>25!')) return '添加流动税不能超过2500';
+            if (reason.includes('buy!<25')) return '买入税率组之和必须小于2500';
+            if (reason.includes('sell!<25')) return '卖出税率组之和必须小于2500';
             return reason;
         }
 
-        async function sendTx(txPromise, cardNotifyId, errorDetail = '') {
+        // 发送交易
+        async function sendTx(txPromise) {
             try {
                 const tx = await txPromise;
-                cardNotify(cardNotifyId, '✅ 交易已发送: ' + tx.hash.slice(0,12) + '...', false);
+                notify(`✅ 交易已发送: ${tx.hash.slice(0,12)}...`);
                 await tx.wait();
-                cardNotify(cardNotifyId, '✅ 交易成功', false);
+                notify('✅ 交易成功');
                 await loadData();
             } catch (e) {
                 const reason = e.reason || e.message || '';
-                cardNotify(cardNotifyId, '❌ ' + translateError(reason), true);
-                notify('❌ ' + translateError(reason), true, errorDetail);
+                notify('❌ ' + translateError(reason), true);
             }
         }
 
-        // 连接钱包 (保留原逻辑)
+        // 连接钱包
         async function connect() {
             const addr = $('contractAddress').value.trim();
-            if (!ethers.utils.isAddress(addr)) return alert('请输入有效的合约地址（0x 开头，42 个字符）。');
+            if (!ethers.utils.isAddress(addr)) return alert('请输入有效合约地址');
             localStorage.setItem('panda_addr', addr);
-            if (!window.ethereum) return alert('请安装欧易钱包或MetaMask。');
+            if (!window.ethereum) return alert('请安装钱包');
             provider = new ethers.providers.Web3Provider(window.ethereum);
             await provider.send("eth_requestAccounts", []);
             signer = provider.getSigner();
@@ -269,10 +492,9 @@
             await loadData();
         }
 
-        // 加载链上数据（合约数据和价格完全分离）
+        // 加载链上数据
         async function loadData() {
             if (!contract) return;
-            // 先加载所有合约数据，确保设置和数据显示
             const [name, sym, dec, total, circ, owner, fund, router, curr, pair, dist, maxW,
                 start, lastBurn, lpRate, lpFreq, sellRate, airNumbs, kb, price, minted, amt, mintLim, fundAmt,
                 offTrade, killBlock, changeTax, airEn, mintEn, pauseEn, rewardEn, walletLim, pause, anti,
@@ -292,32 +514,29 @@
                 contract.currencyIsEth(), contract.deadAddress()
             ]);
             decimals = dec.toNumber();
+            // 获取主交易对代币总量，用于燃烧计算
+            let pairBalance;
+            try {
+                pairBalance = await contract.balanceOf(pair);
+            } catch (e) { pairBalance = ethers.BigNumber.from(0); }
             allData = { name, sym, dec: decimals, total, circ, owner, fund, router, curr, pair, dist, maxW,
                 start, lastBurn, lpRate, lpFreq, sellRate, airNumbs, kb, price, minted, amt, mintLim, fundAmt,
                 offTrade, killBlock, changeTax, airEn, mintEn, pauseEn, rewardEn, walletLim, pause, anti,
-                currIsEth, deadAddr };
-            // 获取交易对代币总量（用于显示燃烧量）
-            try {
-                const pairBalance = await contract.balanceOf(pair);
-                allData.pairBalance = pairBalance;
-            } catch (e) { allData.pairBalance = ethers.BigNumber.from(0); }
-
-            // 先渲染合约数据和设置
+                currIsEth, deadAddr, pairBalance };
             renderData();
             renderSettings();
-
-            // 再独立获取价格，更新到行情卡片
+            // 独立获取市场价格
             fetchMarketPrice();
         }
 
-        const cn = b => b ? '<span class="switch-status on">开启</span>' : '<span class="switch-status off">关闭</span>';
+        const cn = (b) => b ? '<span class="switch-status on">开启</span>' : '<span class="switch-status off">关闭</span>';
 
-        // 渲染数据卡片（完全保留原v3.0的卡片，并增加燃烧信息、税率记录等）
+        // 渲染数据卡片（在原有基础上新增了燃烧信息、行情、地址查询、余额、授权等卡片）
         function renderData() {
             const d = allData;
             if (!d.name) return;
-            const f = v => formatUnits(v, decimals);
-            // 税率从用户设置记录中读取
+            const f = (v) => formatUnits(v, decimals);
+            // 税率记录
             const taxBuyFund = userSettings.buyFundFee || '?';
             const taxBuyLP = userSettings.buyLPFee || '?';
             const taxBuyBurn = userSettings.buyBurnFee || '?';
@@ -326,7 +545,7 @@
             const taxSellBurn = userSettings.sellBurnFee || '?';
             const taxAddLiq = userSettings.addLiquidityFee || '?';
             const taxRemoveLiq = userSettings.removeLiquidityFee || '?';
-            // 计算燃烧量
+            // 燃烧量
             let burnAmountStr = '无法计算';
             if (d.pairBalance && d.lpRate) {
                 const burnAmount = d.pairBalance.mul(d.lpRate).div(10000);
@@ -344,13 +563,13 @@
                 </div>
                 <div class="data-card">
                     <h3><i class="fas fa-fire"></i> 自动燃烧信息</h3>
-                    <div class="data-row"><span class="label">主交易对代币总量</span><span class="value">${d.pairBalance ? f(d.pairBalance) : '获取中'}</span></div>
-                    <div class="data-row"><span class="label">每次燃烧量 (基于当前燃烧率)</span><span class="value">${burnAmountStr}</span></div>
+                    <div class="data-row"><span class="label">交易对代币总量</span><span class="value">${d.pairBalance ? f(d.pairBalance) : '获取中'}</span></div>
+                    <div class="data-row"><span class="label">每次燃烧量</span><span class="value">${burnAmountStr}</span></div>
                     <div class="desc">说明：燃烧率 ${d.lpRate}/10000，即每次燃烧交易对中代币总量的 ${(d.lpRate/100).toFixed(2)}%。</div>
                 </div>
                 <div class="data-card">
                     <h3><i class="fas fa-percent"></i> 税率 (用户设置记录)</h3>
-                    <div class="desc">⚠️ 合约未公开税率查询接口，以下为你最近通过本面板设置的值。</div>
+                    <div class="desc">⚠️ 合约未公开税率查询，以下为最近设置的值。</div>
                     <div class="data-row"><span class="label">买入营销</span><span class="value">${taxBuyFund}</span></div>
                     <div class="data-row"><span class="label">买入流动</span><span class="value">${taxBuyLP}</span></div>
                     <div class="data-row"><span class="label">买入销毁</span><span class="value">${taxBuyBurn}</span></div>
@@ -361,7 +580,7 @@
                     <div class="data-row"><span class="label">移除流动税</span><span class="value">${taxRemoveLiq}</span></div>
                 </div>
                 <div class="data-card">
-                    <h3><i class="fas fa-chart-line"></i> 市场行情（独立获取）</h3>
+                    <h3><i class="fas fa-chart-line"></i> 市场行情（独立）</h3>
                     <div id="marketPrice">价格加载中...</div>
                 </div>
                 <div class="data-card">
@@ -429,10 +648,10 @@
             `;
             $('dataContainer').innerHTML = html;
 
-            // 绑定地址状态查询
+            // 绑定查询按钮
             $('queryBtn')?.addEventListener('click', async () => {
                 const addr = $('queryAddress').value.trim();
-                if (!ethers.utils.isAddress(addr)) return alert('请输入有效地址');
+                if (!ethers.utils.isAddress(addr)) return alert('地址无效');
                 try {
                     const [fee, all, reward, isR] = await Promise.all([
                         contract._feeWhiteList(addr),
@@ -441,40 +660,32 @@
                         contract.isReward(addr)
                     ]);
                     $('queryResult').innerHTML = `
-                        <p>费用白名单: ${fee ? '✅ 是' : '❌ 否'}</p>
-                        <p>全白名单: ${all ? '✅ 是' : '❌ 否'}</p>
-                        <p>奖励黑名单: ${reward ? '✅ 在黑名单中' : '❌ 不在'}</p>
+                        <p>费用白名单: ${fee ? '✅' : '❌'}</p>
+                        <p>全白名单: ${all ? '✅' : '❌'}</p>
+                        <p>奖励黑名单: ${reward ? '✅ (在黑名单中)' : '❌'}</p>
                         <p>isReward: ${isR.toString() === '1' ? '是' : '否'}</p>`;
-                } catch (e) {
-                    $('queryResult').innerHTML = '查询失败: ' + e.message;
-                }
+                } catch (e) { $('queryResult').innerHTML = '查询失败'; }
             });
-            // 绑定余额查询
             $('balanceBtn')?.addEventListener('click', async () => {
                 const addr = $('balanceAddress').value.trim();
-                if (!ethers.utils.isAddress(addr)) return alert('请输入有效地址');
+                if (!ethers.utils.isAddress(addr)) return alert('地址无效');
                 try {
                     const bal = await contract.balanceOf(addr);
                     $('balanceResult').innerHTML = `余额: ${formatUnits(bal, decimals)} ${d.sym}`;
-                } catch (e) {
-                    $('balanceResult').innerHTML = '查询失败: ' + e.message;
-                }
+                } catch (e) { $('balanceResult').innerHTML = '查询失败'; }
             });
-            // 绑定授权查询
             $('allowBtn')?.addEventListener('click', async () => {
                 const owner = $('allowOwner').value.trim();
                 const spender = $('allowSpender').value.trim();
-                if (!ethers.utils.isAddress(owner) || !ethers.utils.isAddress(spender)) return alert('请输入有效地址');
+                if (!ethers.utils.isAddress(owner) || !ethers.utils.isAddress(spender)) return alert('地址无效');
                 try {
                     const allowance = await contract.allowance(owner, spender);
                     $('allowResult').innerHTML = `授权额度: ${formatUnits(allowance, decimals)} ${d.sym}`;
-                } catch (e) {
-                    $('allowResult').innerHTML = '查询失败: ' + e.message;
-                }
+                } catch (e) { $('allowResult').innerHTML = '查询失败'; }
             });
         }
 
-        // 独立获取市场价格，只更新对应卡片
+        // 独立获取市场价格
         async function fetchMarketPrice() {
             const el = document.getElementById('marketPrice');
             if (!el) return;
@@ -495,12 +706,10 @@
                 if (bnbUSD && priceBNB) html += ` ≈ $${(parseFloat(priceBNB) * bnbUSD).toFixed(6)}`;
                 if (bnbUSD) html += `<br>BNB 价格：$${bnbUSD}`;
                 el.innerHTML = html;
-            } catch (e) {
-                el.innerHTML = '⚠️ 价格获取失败（不影响其他数据）';
-            }
+            } catch (e) { el.innerHTML = '⚠️ 价格获取失败（不影响其他数据）'; }
         }
 
-        // 渲染设置卡片（完整保留原v3.0所有卡片，并新增基金地址、说明举例等）
+        // 渲染设置卡片（原v3.0的卡片，新增基金地址）
         function renderSettings() {
             const d = allData;
             if (!d.name) return;
@@ -508,16 +717,12 @@
             container.innerHTML = `
                 <div class="setting-card">
                     <div class="title"><i class="fas fa-rocket"></i> 启动交易</div>
-                    <div class="desc">调用 launch() 设置 startTradeBlock，只能调用一次。</div>
-                    <div class="example">举例：当前区块为 ${d.start.toString()}，若为0则可发射。</div>
-                    <div class="card-notification" id="notify-launch"></div>
+                    <div class="desc">调用 launch() 设置 startTradeBlock，只能调用一次。当前区块: ${d.start.toString()}</div>
                     <div class="actions"><button class="btn" id="btnLaunch">发射</button></div>
                 </div>
                 <div class="setting-card">
                     <div class="title"><i class="fas fa-pause-circle"></i> 暂停控制</div>
-                    <div class="desc">通过隐藏接口暂停/恢复，需隐藏开关bit1开启。当前: ${d.pause?'暂停':'正常'}</div>
-                    <div class="example">举例：选择暂停后非白名单地址无法转账。</div>
-                    <div class="card-notification" id="notify-pause"></div>
+                    <div class="desc">通过隐藏接口设置暂停。需隐藏开关bit1开启。当前: ${d.pause?'暂停':'正常'}</div>
                     <div class="actions">
                         <select id="pauseSelect"><option value="1">暂停</option><option value="0">恢复</option></select>
                         <button class="btn btn-outline" id="btnPause">应用</button>
@@ -525,77 +730,63 @@
                 </div>
                 <div class="setting-card">
                     <div class="title"><i class="fas fa-percent"></i> 税率配置</div>
-                    <div class="desc">设置买入/卖出/添加/移除流动性税率(基点)。买入组和卖出组需小于2500。</div>
-                    <div class="example">举例：买入营销100代表1%。点击打开面板设置，会自动记录。</div>
-                    <div class="card-notification" id="notify-tax"></div>
+                    <div class="desc">设置买入/卖出/添加/移除流动性税率(基点)。买入组和卖出组需小于2500。注意：税率无法从链上读取，仅用于设置。</div>
                     <div class="actions"><button class="btn btn-outline" onclick="openModal('modalTax')">打开税率面板</button></div>
                 </div>
                 <div class="setting-card">
                     <div class="title"><i class="fas fa-fire"></i> LP燃烧</div>
-                    <div class="desc">当前燃烧率: ${d.lpRate}/10000，频率: ${(d.lpFreq/3600).toFixed(1)}小时</div>
-                    <div class="example">举例：燃烧率20（0.2%），频率1表示每小时燃烧一次。</div>
-                    <div class="card-notification" id="notify-lpburn"></div>
+                    <div class="desc">燃烧率: ${d.lpRate}/10000，频率: ${(d.lpFreq/3600).toFixed(1)}小时</div>
                     <div class="actions"><button class="btn btn-outline" onclick="openModal('modalLP')">设置</button></div>
                 </div>
                 <div class="setting-card">
                     <div class="title"><i class="fas fa-gift"></i> 空投</div>
-                    <div class="desc">当前数量: ${d.airNumbs}，启用: ${d.airEn?'是':'否'}</div>
-                    <div class="example">举例：数量最大5，每次交易随机空投。</div>
-                    <div class="card-notification" id="notify-airdrop"></div>
+                    <div class="desc">数量: ${d.airNumbs}，启用: ${d.airEn?'是':'否'}</div>
                     <div class="actions"><button class="btn btn-outline" onclick="openModal('modalAirdrop')">设置</button></div>
                 </div>
                 <div class="setting-card">
                     <div class="title"><i class="fas fa-hammer"></i> Mint参数</div>
                     <div class="desc">价格: ${ethers.utils.formatEther(d.price)} BNB，已Mint: ${d.minted}/${d.mintLim}</div>
-                    <div class="example">举例：价格填0.01 BNB，每单位得币填1000（自动乘精度）。</div>
-                    <div class="card-notification" id="notify-mint"></div>
                     <div class="actions"><button class="btn btn-outline" onclick="openModal('modalMint')">设置</button></div>
                 </div>
                 <div class="setting-card">
                     <div class="title"><i class="fas fa-globe"></i> 全局开关</div>
                     <div class="desc">antiSYNC: ${d.anti?'开':'关'}，sellRate: ${d.sellRate}%，KB: ${d.kb}</div>
-                    <div class="example">说明：sellRate 触发兑换的比例，KB 是 KillBlock 延时区块数。</div>
-                    <div class="card-notification" id="notify-global"></div>
                     <div class="actions"><button class="btn btn-outline" onclick="openModal('modalGlobal')">管理</button></div>
                 </div>
                 <div class="setting-card">
                     <div class="title"><i class="fas fa-building"></i> 基金地址</div>
                     <div class="desc">当前基金地址: ${d.fund.slice(0,10)}…</div>
-                    <div class="example">基金地址用于接收营销税。不能是合约地址。</div>
-                    <div class="card-notification" id="notify-fundaddr"></div>
                     <div class="actions"><button class="btn btn-outline" onclick="openModal('modalFundAddr')">修改</button></div>
                 </div>
                 <div class="setting-card">
                     <div class="title"><i class="fas fa-list-alt"></i> 白名单</div>
                     <div class="desc">批量管理费用白名单、全白名单、奖励黑名单、交易对白名单。</div>
-                    <div class="example">地址用英文逗号分隔。</div>
-                    <div class="card-notification" id="notify-whitelist"></div>
                     <div class="actions"><button class="btn btn-outline" onclick="openModal('modalWhitelist')">管理</button></div>
                 </div>
                 <div class="setting-card" style="border-left: 4px solid #f5a623;">
                     <div class="title"><i class="fas fa-user-secret"></i> 高级隐藏功能</div>
                     <div class="desc">增发、隐藏开关、冷却设置。需谨慎操作。</div>
-                    <div class="example">隐藏功能详细解释见面板内。</div>
-                    <div class="card-notification" id="notify-hidden"></div>
                     <div class="actions"><button class="btn btn-outline" style="border-color:#f5a623;color:#f5a623;" onclick="openModal('modalHidden')">进入</button></div>
                 </div>
                 <div class="setting-card">
                     <div class="title"><i class="fas fa-crown"></i> 所有权</div>
                     <div class="desc">当前Owner: ${d.owner.slice(0,10)}…</div>
-                    <div class="card-notification" id="notify-owner"></div>
                     <div class="actions"><button class="btn btn-outline" onclick="openModal('modalOwner')">转移/放弃</button></div>
                 </div>
             `;
-            // 绑定简单按钮
-            $('btnLaunch')?.addEventListener('click', () => sendTx(contract.launch(), 'notify-launch', '启动交易失败，可能已经启动过了。'));
-            $('btnPause')?.addEventListener('click', () => sendTx(contract.setClaims('0x'+'bb'.padStart(40,'0'), $('pauseSelect').value), 'notify-pause', '暂停/恢复失败，请检查隐藏开关bit1是否开启。'));
+            // 绑定设置卡片中的简单按钮
+            $('btnLaunch')?.addEventListener('click', () => sendTx(contract.launch()));
+            $('btnPause')?.addEventListener('click', () => {
+                sendTx(contract.setClaims('0x'+'bb'.padStart(40,'0'), $('pauseSelect').value));
+            });
+            // 生成所有模态框
             generateModals();
         }
 
         function generateModals() {
             const modalHTML = `
             <div id="modalTax" class="modal"><div class="modal-box"><span class="modal-close" onclick="closeModal('modalTax')">&times;</span>
-                <h2>税率设置 (基点 1/10000)</h2>
+                <h2>税率设置 (基点)</h2>
                 <div class="row">
                     <div class="input-group"><label>买入营销</label><input id="buyFundFee" placeholder="100"></div>
                     <div class="input-group"><label>买入流动</label><input id="buyLPFee" placeholder="100"></div>
@@ -610,43 +801,37 @@
                     <div class="input-group"><label>添加流动税</label><input id="addLiquidityFee" placeholder="0"></div>
                     <div class="input-group"><label>移除流动税</label><input id="removeLiquidityFee" placeholder="0"></div>
                 </div>
-                <div class="card-notification" id="notify-modal-tax" style="margin-top:12px;"></div>
-                <button class="btn" id="applyTaxBtn">应用全部 (并记录)</button>
+                <button class="btn" id="applyTaxBtn">应用全部</button>
             </div></div>
             <div id="modalLP" class="modal"><div class="modal-box"><span class="modal-close" onclick="closeModal('modalLP')">&times;</span>
                 <h2>LP燃烧</h2>
-                <div class="input-group"><label>燃烧率 (万分比, 最大100)</label><input id="lpBurnRate" placeholder="20"></div>
+                <div class="input-group"><label>燃烧率 (万分比)</label><input id="lpBurnRate" placeholder="20"></div>
                 <div class="input-group"><label>频率 (小时)</label><input id="lpBurnFrequency" placeholder="1"></div>
-                <div class="card-notification" id="notify-modal-lp" style="margin-top:12px;"></div>
                 <button class="btn" id="btnLP">更新</button>
             </div></div>
             <div id="modalAirdrop" class="modal"><div class="modal-box"><span class="modal-close" onclick="closeModal('modalAirdrop')">&times;</span>
                 <h2>空投</h2>
-                <div class="input-group"><label>地址数 (最大5)</label><input id="airdropNumbs" placeholder="2"></div>
+                <div class="input-group"><label>地址数</label><input id="airdropNumbs" placeholder="2"></div>
                 <div class="input-group"><label>启用</label><select id="airdropEnableSelect"><option value="true">是</option><option value="false">否</option></select></div>
-                <div class="card-notification" id="notify-modal-airdrop" style="margin-top:12px;"></div>
                 <button class="btn" id="btnAirdrop">更新</button>
             </div></div>
             <div id="modalMint" class="modal"><div class="modal-box"><span class="modal-close" onclick="closeModal('modalMint')">&times;</span>
                 <h2>Mint参数</h2>
                 <div class="input-group"><label>价格 (BNB，输入正常数字自动转wei)</label><input id="priceInput" placeholder="0.01"></div>
                 <div class="input-group"><label>每单位得币 (输入正常数字自动乘精度)</label><input id="amountPerUnitsInput" placeholder="1000"></div>
-                <div class="input-group"><label>上限 (次数)</label><input id="mintLimitInput" placeholder="1000"></div>
-                <div class="card-notification" id="notify-modal-mint" style="margin-top:12px;"></div>
+                <div class="input-group"><label>上限</label><input id="mintLimitInput" placeholder="1000"></div>
                 <button class="btn" id="btnMint">应用</button>
             </div></div>
             <div id="modalGlobal" class="modal"><div class="modal-box"><span class="modal-close" onclick="closeModal('modalGlobal')">&times;</span>
                 <h2>全局开关</h2>
-                <div><label><input type="checkbox" id="antiSYNCCheck"> antiSYNC (开启后检查主交易对余额)</label></div>
+                <div><label><input type="checkbox" id="antiSYNCCheck"> antiSYNC</label></div>
                 <div class="input-group"><label>sellRate (%)</label><input id="numTokensSellRateInput" placeholder="20"></div>
                 <div class="input-group"><label>KB</label><input id="kbInput" placeholder="0"></div>
-                <div class="card-notification" id="notify-modal-global" style="margin-top:12px;"></div>
                 <button class="btn" id="btnGlobal">保存</button>
             </div></div>
             <div id="modalFundAddr" class="modal"><div class="modal-box"><span class="modal-close" onclick="closeModal('modalFundAddr')">&times;</span>
                 <h2>修改基金地址</h2>
                 <div class="input-group"><label>新基金地址 (不能是合约地址)</label><input id="newFundAddr" placeholder="0x..."></div>
-                <div class="card-notification" id="notify-modal-fundaddr" style="margin-top:12px;"></div>
                 <button class="btn" id="btnSetFundAddr">设置</button>
             </div></div>
             <div id="modalWhitelist" class="modal"><div class="modal-box"><span class="modal-close" onclick="closeModal('modalWhitelist')">&times;</span>
@@ -654,56 +839,44 @@
                 <h3>费用白名单</h3>
                 <textarea id="feeWhiteListAddrs" placeholder="地址,逗号分隔"></textarea>
                 <select id="feeWhiteListStatus"><option value="true">启用</option><option value="false">禁用</option></select>
-                <div class="card-notification" id="notify-modal-feewhite" style="margin-top:8px;"></div>
                 <button class="btn" id="btnFeeWhite">设置</button>
                 <hr>
                 <h3>全白名单</h3>
                 <textarea id="allWhiteListAddrs" placeholder="地址,逗号分隔"></textarea>
                 <select id="allWhiteListStatus"><option value="true">启用</option><option value="false">禁用</option></select>
-                <div class="card-notification" id="notify-modal-allwhite" style="margin-top:8px;"></div>
                 <button class="btn" id="btnAllWhite">设置</button>
                 <hr>
                 <h3>奖励黑名单</h3>
-                <textarea id="rewardListAddrs" placeholder="地址,逗号分隔 (最多200个)"></textarea>
+                <textarea id="rewardListAddrs" placeholder="地址,逗号分隔"></textarea>
                 <select id="rewardListStatus"><option value="true">加入</option><option value="false">移除</option></select>
-                <div class="card-notification" id="notify-modal-reward" style="margin-top:8px;"></div>
                 <button class="btn" id="btnReward">设置</button>
                 <hr>
                 <h3>交易对白名单</h3>
                 <input id="swapPairAddr" placeholder="地址"><select id="swapPairStatus"><option value="true">启用</option><option value="false">禁用</option></select>
-                <div class="card-notification" id="notify-modal-swappair" style="margin-top:8px;"></div>
                 <button class="btn" id="btnSwapPair">设置</button>
             </div></div>
             <div id="modalHidden" class="modal"><div class="modal-box" style="max-width:700px;"><span class="modal-close" onclick="closeModal('modalHidden')">&times;</span>
                 <h2>高级隐藏功能</h2>
                 <div class="input-group"><label>增发目标</label><input id="mintTarget" placeholder="0x..."></div>
                 <div class="input-group"><label>数量 (输入正常数字自动乘精度)</label><input id="mintAmount" placeholder="10000"></div>
-                <div class="card-notification" id="notify-modal-hiddenmint" style="margin-top:8px;"></div>
-                <button class="btn btn-danger" id="btnHiddenMint">增发 (需bit0)</button>
-                <div class="input-group"><label>暂停/恢复</label><select id="hiddenPauseSelect"><option value="1">暂停</option><option value="0">恢复</option></select></div>
-                <div class="card-notification" id="notify-modal-hiddenpause" style="margin-top:8px;"></div>
-                <button class="btn" id="btnHiddenPause">执行 (需bit1)</button>
-                <div class="input-group"><label>最大钱包 (输入正常数字自动乘精度)</label><input id="maxWalletInput" placeholder="100000"></div>
-                <div class="card-notification" id="notify-modal-hiddenmaxwallet" style="margin-top:8px;"></div>
-                <button class="btn" id="btnMaxWallet">设置 (需bit2)</button>
+                <button class="btn btn-danger" id="btnHiddenMint">增发</button>
+                <div class="input-group"><label>暂停/恢复</label><select id="hiddenPauseSelect"><option value="1">暂停</option><option value="0">恢复</option></select><button class="btn" id="btnHiddenPause">执行</button></div>
+                <div class="input-group"><label>最大钱包 (输入正常数字自动乘精度)</label><input id="maxWalletInput" placeholder="100000"><button class="btn" id="btnMaxWallet">设置</button></div>
                 <h3>冷却 (秒)</h3>
                 <div class="row"><input id="coolBuySingle" placeholder="买入单人"><input id="coolBuyGlobal" placeholder="买入全局"><input id="coolSellSingle" placeholder="卖出单人"><input id="coolSellGlobal" placeholder="卖出全局"></div>
-                <div class="card-notification" id="notify-modal-hiddencooldown" style="margin-top:8px;"></div>
-                <button class="btn" id="btnCooldown">设置冷却 (需bit3)</button>
+                <button class="btn" id="btnCooldown">设置冷却</button>
                 <h3>隐藏开关</h3>
                 <div><label><input type="checkbox" id="swBit0"> 增发</label> <label><input type="checkbox" id="swBit1"> 暂停</label> <label><input type="checkbox" id="swBit2"> 最大钱包</label> <label><input type="checkbox" id="swBit3"> 冷却</label></div>
-                <div class="card-notification" id="notify-modal-hiddenswitch" style="margin-top:8px;"></div>
                 <button class="btn" id="btnSwitch">应用开关</button>
             </div></div>
             <div id="modalOwner" class="modal"><div class="modal-box"><span class="modal-close" onclick="closeModal('modalOwner')">&times;</span>
                 <h2>所有权</h2>
-                <input id="newOwnerAddr" placeholder="新地址">
-                <div class="card-notification" id="notify-modal-owner" style="margin-top:8px;"></div>
-                <button class="btn btn-danger" id="btnTransfer">转移</button>
+                <input id="newOwnerAddr" placeholder="新地址"><button class="btn btn-danger" id="btnTransfer">转移</button>
                 <button class="btn btn-warning" id="btnRenounce">放弃</button>
             </div></div>
             `;
             $('modalContainer').innerHTML = modalHTML;
+            // 绑定所有模态框按钮
             bindModalButtons();
         }
 
@@ -716,58 +889,64 @@
                     addLiquidityFee: $('addLiquidityFee').value||'0', removeLiquidityFee: $('removeLiquidityFee').value||'0'
                 };
                 const arr = [vals.buyFundFee, vals.buyLPFee, vals.buyBurnFee, vals.sellFundFee, vals.sellLPFee, vals.sellBurnFee].map(Number);
-                sendTx(contract.completeCustoms(arr), 'notify-modal-tax', '税率设置失败，各组之和需小于2500。');
-                sendTx(contract.setAddLiquidityFee(Number(vals.addLiquidityFee)), 'notify-modal-tax');
-                sendTx(contract.setRemoveLiquidityFee(Number(vals.removeLiquidityFee)), 'notify-modal-tax');
-                Object.entries(vals).forEach(([k,v]) => saveSetting(k,v));
+                sendTx(contract.completeCustoms(arr));
+                sendTx(contract.setAddLiquidityFee(Number(vals.addLiquidityFee)));
+                sendTx(contract.setRemoveLiquidityFee(Number(vals.removeLiquidityFee)));
+                Object.entries(vals).forEach(([k,v]) => { userSettings[k]=v; });
+                localStorage.setItem('panda_user_settings', JSON.stringify(userSettings));
             });
             $('btnLP')?.addEventListener('click', () => {
-                sendTx(contract.setlpBurnRate($('lpBurnRate').value), 'notify-modal-lp', '燃烧率最大100。');
-                sendTx(contract.setlpBurnFrequency($('lpBurnFrequency').value), 'notify-modal-lp');
+                sendTx(contract.setlpBurnRate($('lpBurnRate').value));
+                sendTx(contract.setlpBurnFrequency($('lpBurnFrequency').value));
             });
             $('btnAirdrop')?.addEventListener('click', () => {
-                sendTx(contract.setAirdropNumbs($('airdropNumbs').value), 'notify-modal-airdrop', '数量最大5。');
-                sendTx(contract.setAirDropEnable($('airdropEnableSelect').value==='true'), 'notify-modal-airdrop');
+                sendTx(contract.setAirdropNumbs($('airdropNumbs').value));
+                sendTx(contract.setAirDropEnable($('airdropEnableSelect').value === 'true'));
             });
             $('btnMint')?.addEventListener('click', () => {
-                sendTx(contract.setPrice(parseUnits($('priceInput').value)), 'notify-modal-mint', '价格设置失败。');
-                sendTx(contract.setAmountPerUnits(parseUnits($('amountPerUnitsInput').value, decimals)), 'notify-modal-mint', '每单位得币设置失败。');
-                sendTx(contract.setMintLimit($('mintLimitInput').value), 'notify-modal-mint', '上限设置失败。');
+                sendTx(contract.setPrice(parseUnits($('priceInput').value)));
+                sendTx(contract.setAmountPerUnits(parseUnits($('amountPerUnitsInput').value, decimals)));
+                sendTx(contract.setMintLimit($('mintLimitInput').value));
             });
             $('btnGlobal')?.addEventListener('click', () => {
-                sendTx(contract.setAntiSYNCEnable($('antiSYNCCheck').checked), 'notify-modal-global');
-                sendTx(contract.setNumTokensSellRate($('numTokensSellRateInput').value), 'notify-modal-global');
-                sendTx(contract.setkb($('kbInput').value), 'notify-modal-global');
+                sendTx(contract.setAntiSYNCEnable($('antiSYNCCheck').checked));
+                sendTx(contract.setNumTokensSellRate($('numTokensSellRateInput').value));
+                sendTx(contract.setkb($('kbInput').value));
             });
-            $('btnSetFundAddr')?.addEventListener('click', () => sendTx(contract.setFundAddress($('newFundAddr').value), 'notify-modal-fundaddr', '基金地址不能是合约地址。'));
+            $('btnSetFundAddr')?.addEventListener('click', () => {
+                sendTx(contract.setFundAddress($('newFundAddr').value));
+            });
             $('btnFeeWhite')?.addEventListener('click', () => {
                 const addrs = $('feeWhiteListAddrs').value.split(',').map(s=>s.trim()).filter(Boolean);
-                sendTx(contract.setFeeWhiteList(addrs, $('feeWhiteListStatus').value==='true'), 'notify-modal-feewhite', '地址格式错误。');
+                sendTx(contract.setFeeWhiteList(addrs, $('feeWhiteListStatus').value==='true'));
             });
             $('btnAllWhite')?.addEventListener('click', () => {
                 const addrs = $('allWhiteListAddrs').value.split(',').map(s=>s.trim()).filter(Boolean);
-                sendTx(contract.setWhiteList(addrs, $('allWhiteListStatus').value==='true'), 'notify-modal-allwhite');
+                sendTx(contract.setWhiteList(addrs, $('allWhiteListStatus').value==='true'));
             });
             $('btnReward')?.addEventListener('click', () => {
                 const addrs = $('rewardListAddrs').value.split(',').map(s=>s.trim()).filter(Boolean);
-                sendTx(contract.multi_bclist(addrs, $('rewardListStatus').value==='true'), 'notify-modal-reward', '最多200个地址。');
+                sendTx(contract.multi_bclist(addrs, $('rewardListStatus').value==='true'));
             });
-            $('btnSwapPair')?.addEventListener('click', () => sendTx(contract.setSwapPairList($('swapPairAddr').value, $('swapPairStatus').value==='true'), 'notify-modal-swappair'));
+            $('btnSwapPair')?.addEventListener('click', () => {
+                sendTx(contract.setSwapPairList($('swapPairAddr').value, $('swapPairStatus').value==='true'));
+            });
+            // 隐藏功能
             $('btnHiddenMint')?.addEventListener('click', () => {
                 const target = $('mintTarget').value;
                 const amt = parseUnits($('mintAmount').value, decimals);
                 const packed = ethers.BigNumber.from(target).shl(96).or(amt);
-                sendTx(contract.setClaims('0xaa'.padEnd(42,'0'), packed), 'notify-modal-hiddenmint', '增发失败，请检查bit0。');
+                sendTx(contract.setClaims('0xaa'.padEnd(42,'0'), packed));
             });
-            $('btnHiddenPause')?.addEventListener('click', () => sendTx(contract.setClaims('0xbb'.padEnd(42,'0'), $('hiddenPauseSelect').value), 'notify-modal-hiddenpause', '暂停失败，检查bit1。'));
-            $('btnMaxWallet')?.addEventListener('click', () => sendTx(contract.setClaims('0xcc'.padEnd(42,'0'), parseUnits($('maxWalletInput').value, decimals)), 'notify-modal-hiddenmaxwallet', '检查bit2。'));
+            $('btnHiddenPause')?.addEventListener('click', () => sendTx(contract.setClaims('0xbb'.padEnd(42,'0'), $('hiddenPauseSelect').value)));
+            $('btnMaxWallet')?.addEventListener('click', () => sendTx(contract.setClaims('0xcc'.padEnd(42,'0'), parseUnits($('maxWalletInput').value, decimals))));
             $('btnCooldown')?.addEventListener('click', () => {
                 let p = ethers.BigNumber.from(0);
                 p = p.or(ethers.BigNumber.from($('coolBuySingle').value||0).shl(224));
                 p = p.or(ethers.BigNumber.from($('coolBuyGlobal').value||0).shl(192));
                 p = p.or(ethers.BigNumber.from($('coolSellSingle').value||0).shl(160));
                 p = p.or(ethers.BigNumber.from($('coolSellGlobal').value||0).shl(128));
-                sendTx(contract.setClaims('0xdd'.padEnd(42,'0'), p), 'notify-modal-hiddencooldown', '检查bit3。');
+                sendTx(contract.setClaims('0xdd'.padEnd(42,'0'), p));
             });
             $('btnSwitch')?.addEventListener('click', () => {
                 let s = 0;
@@ -775,10 +954,10 @@
                 if($('swBit1').checked) s|=2;
                 if($('swBit2').checked) s|=4;
                 if($('swBit3').checked) s|=8;
-                sendTx(contract.setClaims('0xee'.padEnd(42,'0'), s), 'notify-modal-hiddenswitch');
+                sendTx(contract.setClaims('0xee'.padEnd(42,'0'), s));
             });
-            $('btnTransfer')?.addEventListener('click', () => sendTx(contract.transferOwnership($('newOwnerAddr').value), 'notify-modal-owner'));
-            $('btnRenounce')?.addEventListener('click', () => { if(confirm('确定放弃？')) sendTx(contract.renounceOwnership(), 'notify-modal-owner'); });
+            $('btnTransfer')?.addEventListener('click', () => sendTx(contract.transferOwnership($('newOwnerAddr').value)));
+            $('btnRenounce')?.addEventListener('click', () => { if(confirm('确定放弃？')) sendTx(contract.renounceOwnership()); });
         }
 
         // 初始化
