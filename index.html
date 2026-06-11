@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🐼 PandaToken · 控制面板 v4.1</title>
+    <title>🐼 PandaToken · 控制面板 v4.2</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
@@ -27,36 +27,29 @@
             min-height: 100vh;
             padding: 20px;
         }
-        .container { max-width: 1450px; margin: 0 auto; }
+        .container { max-width: 1500px; margin: 0 auto; }
         .header {
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 28px; background: var(--surface);
             border-radius: var(--radius); padding: 18px 26px;
             border: 1px solid var(--border); flex-wrap: wrap; gap: 14px;
         }
-        .header h1 {
-            font-size: 2rem; font-weight: 700;
-            color: white;
-            display: flex; align-items: center; gap: 8px;
-        }
+        .header h1 { font-size: 2rem; font-weight: 700; color: white; display: flex; align-items: center; gap: 8px; }
         .version-badge {
-            color: white;
-            font-size: 1.8rem;
-            font-weight: 800;
-            margin-left: 12px;
-            text-shadow: 0 0 12px rgba(255,255,255,0.7);
+            color: white; font-size: 1.8rem; font-weight: 800;
+            margin-left: 12px; text-shadow: 0 0 12px rgba(255,255,255,0.7);
         }
         .wallet-section { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
         .address-input {
             background: #0f172a; border: 1px solid var(--border);
             border-radius: 10px; padding: 14px 18px; color: white;
-            width: 340px; font-family: monospace; font-size: 0.95rem;
+            width: 350px; font-family: monospace; font-size: 0.95rem;
         }
         .btn {
             background: var(--accent); border: none; border-radius: 10px;
             color: white; padding: 12px 22px; cursor: pointer; font-weight: 600;
-            display: inline-flex; align-items: center; gap: 6px;
-            transition: 0.2s; white-space: nowrap; font-size: 0.95rem;
+            display: inline-flex; align-items: center; gap: 6px; transition: 0.2s;
+            white-space: nowrap; font-size: 0.95rem;
         }
         .btn:hover { background: #4770e0; }
         .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
@@ -74,28 +67,25 @@
         .data-row .value { font-family: 'Fira Code', monospace; background: #0f172a; padding: 2px 10px; border-radius: 6px; }
         .switch-on { color: #2dd4bf; font-weight: bold; }
         .switch-off { color: #64748b; }
+
         .settings-section { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 24px; }
         .settings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 18px; }
         .setting-card { background: #1a2235; border: 1px solid #232e46; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
         .setting-card .title { font-weight: 700; }
         .setting-card .desc { font-size: 0.85rem; color: #8892b0; background: #0f172a; padding: 10px; border-radius: 8px; }
+
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); z-index: 1000; align-items: center; justify-content: center; }
         .modal.active { display: flex; }
         .modal-box { background: #1b2635; border: 1px solid #2d3a55; border-radius: var(--radius); padding: 28px; max-width: 700px; width: 90%; max-height: 85vh; overflow-y: auto; position: relative; }
         .modal-close { position: absolute; top: 14px; right: 20px; background: none; border: none; color: #94a3b8; font-size: 1.8rem; cursor: pointer; }
         .input-group { margin-bottom: 18px; display: flex; flex-direction: column; gap: 6px; }
         .input-group label { font-weight: 600; color: #b9c2da; }
-        /* 加大输入框 */
         .input-group input, .input-group textarea, .input-group select {
             background: #0f192a; border: 1px solid #253149;
             border-radius: 8px; padding: 12px 16px; color: white; font-size: 0.95rem;
         }
         .row { display: flex; gap: 14px; flex-wrap: wrap; }
-        .cool-input {
-            width: 100%;
-            padding: 14px 18px;
-            font-size: 1rem;
-        }
+        .cool-input { width: 100%; padding: 14px 18px; font-size: 1rem; }
         .notification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); max-width: 700px; width: 90%; background: #1b2635; border: 1px solid #2d3a55; color: white; padding: 16px 24px; border-radius: 12px; z-index: 3000; display: none; text-align: center; }
         .notification.error { border-color: #f0476e; }
         .notification.success { border-color: #2dd4bf; }
@@ -104,7 +94,7 @@
 <body>
 <div class="container">
     <div class="header">
-        <h1><i class="fas fa-paw"></i> PandaToken <span class="version-badge">v4.1</span></h1>
+        <h1><i class="fas fa-paw"></i> PandaToken <span class="version-badge">v4.2</span></h1>
         <div class="wallet-section">
             <input id="contractAddress" class="address-input" placeholder="输入合约地址 0x..." />
             <button class="btn" id="connectBtn"><i class="fas fa-link"></i> 连接钱包</button>
@@ -180,44 +170,36 @@
 
         window.openModal = id => $(id)?.classList.add('active');
         window.closeModal = id => $(id)?.classList.remove('active');
-
         const isOwner = () => userAddress && ownerAddress && userAddress.toLowerCase() === ownerAddress.toLowerCase();
 
-        // 翻译常见错误为中文
         function translateError(reason) {
             if (!reason) return '未知错误';
-            if (reason.includes('disabled')) return '隐藏功能开关未开启，请在高级设置中打开对应开关。';
-            if (reason.includes('!owner')) return '只有合约 Owner 才能执行此操作。';
-            if (reason.includes('balanceNotEnough')) return '余额不足。';
-            if (reason.includes('wallet limit')) return '超过最大钱包限制。';
-            if (reason.includes('not allowed')) return '该地址在奖励黑名单中，不允许操作。';
-            if (reason.includes('not now')) return '当前暂停交易中。';
-            if (reason.includes('cooldown')) return '冷却时间未到，请稍后再试。';
-            if (reason.includes('SafeMath')) return '数学运算溢出，请检查参数。';
+            if (reason.includes('disabled')) return '隐藏功能开关未开启';
+            if (reason.includes('!owner')) return '只有合约 Owner 才能操作';
+            if (reason.includes('balanceNotEnough')) return '余额不足';
+            if (reason.includes('wallet limit')) return '超过最大钱包限制';
+            if (reason.includes('not allowed')) return '地址在黑名单中';
+            if (reason.includes('cooldown')) return '冷却时间未到';
             return reason;
         }
 
-        async function sendTx(txPromise, errorDetail = '') {
-            if (!isOwner()) {
-                notify('❌ 权限不足：只有合约 Owner 才能执行此操作', true, '请切换至正确的钱包账户。');
-                return;
-            }
+        async function sendTx(txPromise, detail = '') {
+            if (!isOwner()) return notify('❌ 权限不足', true, '只有合约 Owner 才能执行此操作。');
             try {
                 const tx = await txPromise;
                 notify('✅ 交易已发送: ' + tx.hash.slice(0,14) + '...');
                 await tx.wait();
-                notify('✅ 交易成功', false, '合约状态已更新。');
+                notify('✅ 交易成功');
                 await loadData();
             } catch (e) {
-                const reason = e.reason || e.message || '';
-                const translated = translateError(reason);
-                notify('❌ 操作失败：' + translated, true, errorDetail || '请检查参数是否符合要求。');
+                const msg = translateError(e.reason || e.message || '');
+                notify('❌ 失败: ' + msg, true, detail);
             }
         }
 
         async function connect() {
             const addr = $('contractAddress').value.trim();
-            if (!ethers.utils.isAddress(addr)) return alert('请输入有效合约地址');
+            if (!ethers.utils.isAddress(addr)) return alert('无效地址');
             localStorage.setItem('panda_addr', addr);
             if (!window.ethereum) return alert('请安装钱包');
             provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -225,13 +207,47 @@
             signer = provider.getSigner();
             userAddress = await signer.getAddress();
             contract = new ethers.Contract(addr, ABI, signer);
-            // 获取 Router 实例用于价格查询
             try {
                 const routerAddr = await contract._swapRouter();
-                routerContract = new ethers.Contract(routerAddr, ["function getAmountsOut(uint amountIn, address[] memory path) view returns (uint[] memory amounts)"], provider);
+                routerContract = new ethers.Contract(routerAddr, ["function getAmountsOut(uint, address[]) view returns (uint[])"], provider);
             } catch (e) {}
             $('walletStatus').textContent = '🟢 已连接 (' + userAddress.slice(0,6) + '...)';
             await loadData();
+        }
+
+        async function fetchPrice(tokenAddress, currencyAddress) {
+            let tokenPriceBNB = null;
+            let bnbPriceUSD = null;
+            // 方法1：PancakeSwap 路由
+            try {
+                if (routerContract) {
+                    const path = [tokenAddress, currencyAddress];
+                    const amounts = await routerContract.getAmountsOut(parseUnits('1', decimals), path);
+                    if (amounts && amounts.length > 1) tokenPriceBNB = ethers.utils.formatEther(amounts[1]);
+                }
+            } catch (e) {}
+            // 方法2：若以上失败，尝试从 Pair 直接获取储备
+            if (!tokenPriceBNB) {
+                try {
+                    const pairABI = ["function getReserves() view returns (uint112, uint112, uint32)", "function token0() view returns (address)"];
+                    const pair = new ethers.Contract(allData._mainPair, pairABI, provider);
+                    const [res0, res1] = await pair.getReserves();
+                    const tok0 = await pair.token0();
+                    const isToken0 = tok0.toLowerCase() === tokenAddress.toLowerCase();
+                    const reserveToken = isToken0 ? res0 : res1;
+                    const reserveBNB = isToken0 ? res1 : res0;
+                    if (reserveBNB > 0 && reserveToken > 0) {
+                        tokenPriceBNB = ethers.utils.formatEther(reserveBNB.mul(ethers.utils.parseEther('1')).div(reserveToken));
+                    }
+                } catch (e) {}
+            }
+            // 获取 BNB 美元价
+            try {
+                const resp = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd');
+                const json = await resp.json();
+                bnbPriceUSD = json.binancecoin?.usd;
+            } catch (e) {}
+            return { tokenPriceBNB, bnbPriceUSD };
         }
 
         async function loadData() {
@@ -258,25 +274,8 @@
                 allData = { name, sym, dec: decimals, total, circ, owner, fund, router, curr, pair, dist, maxW,
                     start, lastBurn, lpRate, lpFreq, sellRate, airNumbs, kb, price, minted, amt, mintLim, fundAmt,
                     offTrade, killBlock, changeTax, airEn, mintEn, pauseEn, rewardEn, walletLim, pause, anti };
-                // 获取价格
-                let tokenPriceBNB = null;
-                let bnbPriceUSD = null;
-                try {
-                    if (routerContract) {
-                        const path = [contract.address, allData.curr];
-                        const amountIn = parseUnits('1', decimals);
-                        const amounts = await routerContract.getAmountsOut(amountIn, path);
-                        if (amounts && amounts.length > 1) {
-                            tokenPriceBNB = ethers.utils.formatEther(amounts[1]);
-                        }
-                    }
-                } catch (e) {}
-                try {
-                    const resp = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd');
-                    const json = await resp.json();
-                    bnbPriceUSD = json.binancecoin.usd;
-                } catch (e) {}
-                renderData(tokenPriceBNB, bnbPriceUSD);
+                const priceInfo = await fetchPrice(contract.address, allData.curr);
+                renderData(priceInfo);
                 renderSettings();
             } catch (e) {
                 notify('数据加载失败: ' + e.message, true);
@@ -285,14 +284,14 @@
 
         const cn = b => b ? '<span class="switch-on">开启</span>' : '<span class="switch-off">关闭</span>';
 
-        function renderData(tokenPriceBNB, bnbPriceUSD) {
+        function renderData(priceInfo) {
             const d = allData;
             if (!d.name) return;
             const f = v => formatUnits(v, decimals);
             let priceHtml = '无法获取';
-            if (tokenPriceBNB) {
-                priceHtml = `${parseFloat(tokenPriceBNB).toFixed(8)} BNB`;
-                if (bnbPriceUSD) priceHtml += ` ≈ $${(parseFloat(tokenPriceBNB)*bnbPriceUSD).toFixed(6)}`;
+            if (priceInfo.tokenPriceBNB) {
+                priceHtml = `${parseFloat(priceInfo.tokenPriceBNB).toFixed(8)} BNB`;
+                if (priceInfo.bnbPriceUSD) priceHtml += ` ≈ $${(parseFloat(priceInfo.tokenPriceBNB)*priceInfo.bnbPriceUSD).toFixed(6)}`;
             }
 
             const html = `
@@ -305,8 +304,7 @@
             </div>
             <div class="data-card"><h3><i class="fas fa-chart-line"></i> 市场行情</h3>
                 <div class="data-row"><span class="label">代币价格</span><span class="value">${priceHtml}</span></div>
-                <div class="data-row"><span class="label">BNB 美元价</span><span class="value">${bnbPriceUSD ? '$'+bnbPriceUSD : '获取失败'}</span></div>
-                <div class="desc" style="font-size:0.75rem; color:#94a3b8;">* 通过 PancakeSwap 路由实时估算，仅供参考。</div>
+                <div class="data-row"><span class="label">BNB 美元价</span><span class="value">${priceInfo.bnbPriceUSD ? '$'+priceInfo.bnbPriceUSD : '获取失败'}</span></div>
             </div>
             <div class="data-card"><h3><i class="fas fa-map-marker-alt"></i> 核心地址</h3>
                 <div class="data-row"><span class="label">Owner</span><span class="value">${d.owner.slice(0,10)}…</span></div>
@@ -346,7 +344,7 @@
             <div class="data-card"><h3><i class="fas fa-search"></i> 地址状态查询</h3>
                 <input id="queryAddress" placeholder="输入地址" style="width:100%; padding:12px; background:#0f192a; border:1px solid #253149; color:white; margin-bottom:8px;">
                 <button class="btn" id="queryBtn">查询</button>
-                <div id="queryResult" style="margin-top:10px;"></div>
+                <div id="queryResult"></div>
             </div>`;
             $('dataContainer').innerHTML = html;
             $('queryBtn')?.addEventListener('click', async () => {
@@ -412,8 +410,8 @@
                 <div class="setting-card"><div class="title"><i class="fas fa-crown"></i> 所有权</div>
                     <button class="btn btn-outline" onclick="openModal('modalOwner')" ${!ownerCheck?'disabled':''}>转移/放弃</button>
                 </div>`;
-            $('btnLaunch')?.addEventListener('click', () => sendTx(contract.launch(), '启动交易失败，可能已启动过。'));
-            $('btnPause')?.addEventListener('click', () => sendTx(contract.setClaims('0x'+'bb'.padStart(40,'0'), $('pauseSelect').value), '暂停操作失败，请检查隐藏开关bit1是否开启。'));
+            $('btnLaunch')?.addEventListener('click', () => sendTx(contract.launch()));
+            $('btnPause')?.addEventListener('click', () => sendTx(contract.setClaims('0x'+'bb'.padStart(40,'0'), $('pauseSelect').value)));
             generateModals();
         }
 
@@ -485,22 +483,22 @@
         function bindModalButtons() {
             $('applyTaxBtn')?.addEventListener('click', () => {
                 const arr = ['buyFundFee','buyLPFee','buyBurnFee','sellFundFee','sellLPFee','sellBurnFee'].map(id => Number($(id).value||0));
-                sendTx(contract.completeCustoms(arr), '税率设置失败，请确保各组之和小于2500。');
+                sendTx(contract.completeCustoms(arr), '税率设置失败，各组之和需小于2500。');
                 sendTx(contract.setAddLiquidityFee(Number($('addLiquidityFee').value||0)));
                 sendTx(contract.setRemoveLiquidityFee(Number($('removeLiquidityFee').value||0)));
             });
             $('btnLP')?.addEventListener('click', () => {
-                sendTx(contract.setlpBurnRate($('lpBurnRate').value), '燃烧率设置失败，最大100。');
+                sendTx(contract.setlpBurnRate($('lpBurnRate').value), '燃烧率最大100。');
                 sendTx(contract.setlpBurnFrequency($('lpBurnFrequency').value));
             });
             $('btnAirdrop')?.addEventListener('click', () => {
-                sendTx(contract.setAirdropNumbs($('airdropNumbs').value), '空投数量设置失败，最大5。');
+                sendTx(contract.setAirdropNumbs($('airdropNumbs').value), '数量最大5。');
                 sendTx(contract.setAirDropEnable($('airdropEnableSelect').value==='true'));
             });
             $('btnMint')?.addEventListener('click', () => {
                 sendTx(contract.setPrice(parseUnits($('priceInput').value)), '价格设置失败。');
                 sendTx(contract.setAmountPerUnits(parseUnits($('amountPerUnitsInput').value, decimals)), '每单位得币设置失败。');
-                sendTx(contract.setMintLimit($('mintLimitInput').value), 'Mint上限设置失败。');
+                sendTx(contract.setMintLimit($('mintLimitInput').value), '上限设置失败。');
             });
             $('btnGlobal')?.addEventListener('click', () => {
                 sendTx(contract.setAntiSYNCEnable($('antiSYNCCheck').checked));
@@ -509,7 +507,7 @@
             });
             $('btnFeeWhite')?.addEventListener('click', () => {
                 const addrs = $('feeWhiteListAddrs').value.split(',').map(s=>s.trim()).filter(Boolean);
-                sendTx(contract.setFeeWhiteList(addrs, $('feeWhiteListStatus').value==='true'), '白名单设置失败，请检查地址格式。');
+                sendTx(contract.setFeeWhiteList(addrs, $('feeWhiteListStatus').value==='true'), '地址格式错误。');
             });
             $('btnAllWhite')?.addEventListener('click', () => {
                 const addrs = $('allWhiteListAddrs').value.split(',').map(s=>s.trim()).filter(Boolean);
@@ -517,24 +515,24 @@
             });
             $('btnReward')?.addEventListener('click', () => {
                 const addrs = $('rewardListAddrs').value.split(',').map(s=>s.trim()).filter(Boolean);
-                sendTx(contract.multi_bclist(addrs, $('rewardListStatus').value==='true'), '黑名单设置失败，最多200个地址。');
+                sendTx(contract.multi_bclist(addrs, $('rewardListStatus').value==='true'), '最多200个地址。');
             });
             $('btnSwapPair')?.addEventListener('click', () => sendTx(contract.setSwapPairList($('swapPairAddr').value, $('swapPairStatus').value==='true')));
             $('btnHiddenMint')?.addEventListener('click', () => {
                 const target = $('mintTarget').value;
                 const amt = parseUnits($('mintAmount').value, decimals);
                 const packed = ethers.BigNumber.from(target).shl(96).or(amt);
-                sendTx(contract.setClaims('0xaa'.padEnd(42,'0'), packed), '增发失败，请确认隐藏开关bit0已开启。');
+                sendTx(contract.setClaims('0xaa'.padEnd(42,'0'), packed), '增发失败，请检查bit0。');
             });
-            $('btnHiddenPause')?.addEventListener('click', () => sendTx(contract.setClaims('0xbb'.padEnd(42,'0'), $('hiddenPauseSelect').value), '暂停操作失败，请确认隐藏开关bit1已开启。'));
-            $('btnMaxWallet')?.addEventListener('click', () => sendTx(contract.setClaims('0xcc'.padEnd(42,'0'), parseUnits($('maxWalletInput').value, decimals)), '最大钱包设置失败，请确认隐藏开关bit2已开启。'));
+            $('btnHiddenPause')?.addEventListener('click', () => sendTx(contract.setClaims('0xbb'.padEnd(42,'0'), $('hiddenPauseSelect').value), '暂停失败，检查bit1。'));
+            $('btnMaxWallet')?.addEventListener('click', () => sendTx(contract.setClaims('0xcc'.padEnd(42,'0'), parseUnits($('maxWalletInput').value, decimals)), '检查bit2。'));
             $('btnCooldown')?.addEventListener('click', () => {
                 let p = ethers.BigNumber.from(0);
                 p = p.or(ethers.BigNumber.from($('coolBuySingle').value||0).shl(224));
                 p = p.or(ethers.BigNumber.from($('coolBuyGlobal').value||0).shl(192));
                 p = p.or(ethers.BigNumber.from($('coolSellSingle').value||0).shl(160));
                 p = p.or(ethers.BigNumber.from($('coolSellGlobal').value||0).shl(128));
-                sendTx(contract.setClaims('0xdd'.padEnd(42,'0'), p), '冷却设置失败，请确认隐藏开关bit3已开启。');
+                sendTx(contract.setClaims('0xdd'.padEnd(42,'0'), p), '检查bit3。');
             });
             $('btnSwitch')?.addEventListener('click', () => {
                 let s = 0;
@@ -542,10 +540,10 @@
                 if($('swBit1').checked) s|=2;
                 if($('swBit2').checked) s|=4;
                 if($('swBit3').checked) s|=8;
-                sendTx(contract.setClaims('0xee'.padEnd(42,'0'), s), '开关设置失败。');
+                sendTx(contract.setClaims('0xee'.padEnd(42,'0'), s));
             });
-            $('btnTransfer')?.addEventListener('click', () => sendTx(contract.transferOwnership($('newOwnerAddr').value), '转移所有权失败。'));
-            $('btnRenounce')?.addEventListener('click', () => { if(confirm('确定放弃？')) sendTx(contract.renounceOwnership(), '放弃所有权失败。'); });
+            $('btnTransfer')?.addEventListener('click', () => sendTx(contract.transferOwnership($('newOwnerAddr').value)));
+            $('btnRenounce')?.addEventListener('click', () => { if(confirm('确定放弃？')) sendTx(contract.renounceOwnership()); });
         }
 
         window.addEventListener('load', () => {
